@@ -259,15 +259,22 @@ function configurarEventos() {
   );
 
   elementos.controleCronometro.addEventListener(
-    "change",
-    async function () {
-      if (elementos.controleCronometro.checked) {
-        await iniciarCronometro();
-      } else {
-        await pausarCronometro();
-      }
+  "change",
+  async function () {
+    if (elementos.controleCronometro.checked) {
+      await iniciarCronometro();
+    } else {
+      await pararEstudo(false);
     }
-  );
+  }
+);
+
+elementos.botaoPararEstudo.addEventListener(
+  "click",
+  async function () {
+    await pararEstudo(true);
+  }
+);
 
   elementos.campoPesquisa.addEventListener(
     "input",
