@@ -17,7 +17,7 @@ const SUPABASE_URL =
   "https://gmhkrdtbsxniazoiqczx.supabase.co";
 
 const SUPABASE_ANON_KEY =
-  "COLE_SUA_CHAVE_ANON_AQUI";
+  "sb_publishable_bOgU7q2HkDFXxX6230cUEg_RNrkhBn0";
 
 /*
   Verifica se você já colocou a chave.
