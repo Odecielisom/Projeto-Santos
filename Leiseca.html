@@ -8,40 +8,114 @@
     content="width=device-width, initial-scale=1.0"
   >
 
+  <meta
+    name="description"
+    content="Sistema de estudos de Lei Seca"
+  >
+
   <title>Lei Seca | Projeto Santos</title>
 
-  <!-- Busca a aparência da página -->
   <link rel="stylesheet" href="Leiseca.css">
 
-  <!-- Conecta com o Supabase -->
+  <!-- Conexão com o Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <!-- Busca as funções da página -->
+  <!-- Funções do sistema -->
   <script src="Leiseca.js" defer></script>
 </head>
 
 <body>
 
   <!-- Fundo escuro usado no celular -->
-  <div id="fundoMenu" class="fundo-menu"></div>
+  <div
+    id="fundoMenu"
+    class="fundo-menu"
+  ></div>
 
-  <!-- Menu principal -->
-  <aside id="menuPrincipal" class="menu-principal">
+  <!-- ===================================================
+       MENU PRINCIPAL
+       =================================================== -->
 
-    <div class="logo">
-      <span class="simbolo-logo">⚡</span>
-      <span>Projeto Santos</span>
+  <aside
+    id="menuPrincipal"
+    class="menu-principal"
+  >
+
+    <div class="cabecalho-menu">
+
+      <div class="logo">
+        <span class="simbolo-logo">⚡</span>
+
+        <span class="texto-menu">
+          Projeto Santos
+        </span>
+      </div>
+
+      <!-- Botão sanfona -->
+      <button
+        id="botaoRecolherMenu"
+        class="botao-recolher-menu"
+        type="button"
+        title="Recolher menu"
+        aria-label="Recolher menu"
+      >
+        ‹
+      </button>
     </div>
 
-    <nav>
-      <p class="titulo-menu">ESTUDOS</p>
+    <nav class="navegacao-principal">
 
-      <button class="item-menu ativo" type="button">
-        <span>▤</span>
-        <span>Lei Seca</span>
+      <p class="titulo-menu texto-menu">
+        ESTUDOS
+      </p>
+
+      <button
+        id="menuLeiSeca"
+        class="item-menu ativo"
+        type="button"
+        title="Lei Seca"
+      >
+        <span class="icone-menu">▤</span>
+
+        <span class="texto-menu">
+          Lei Seca
+        </span>
       </button>
 
-      <p class="titulo-menu titulo-administracao">
+      <button
+        id="menuRevisoes"
+        class="item-menu"
+        type="button"
+        title="Revisões"
+      >
+        <span class="icone-menu">↻</span>
+
+        <span class="texto-menu">
+          Revisões
+        </span>
+
+        <span
+          id="quantidadeRevisoesMenu"
+          class="contador-menu texto-menu"
+        >
+          0
+        </span>
+      </button>
+
+      <button
+        id="menuInsights"
+        class="item-menu"
+        type="button"
+        title="Insights"
+      >
+        <span class="icone-menu">▥</span>
+
+        <span class="texto-menu">
+          Insights
+        </span>
+      </button>
+
+      <p class="titulo-menu titulo-administracao texto-menu">
         ADMINISTRAÇÃO
       </p>
 
@@ -49,21 +123,34 @@
         id="botaoGerenciar"
         class="item-menu"
         type="button"
+        title="Gerenciar conteúdo"
       >
-        <span>⚙</span>
-        <span>Gerenciar conteúdo</span>
+        <span class="icone-menu">⚙</span>
+
+        <span class="texto-menu">
+          Gerenciar conteúdo
+        </span>
       </button>
     </nav>
 
+    <!-- Usuário conectado -->
     <div class="usuario">
 
-      <div id="letraUsuario" class="foto-usuario">
+      <div
+        id="letraUsuario"
+        class="foto-usuario"
+      >
         U
       </div>
 
-      <div class="dados-usuario">
-        <strong id="nomeUsuario">Usuário</strong>
-        <small id="emailUsuario">Modo demonstração</small>
+      <div class="dados-usuario texto-menu">
+        <strong id="nomeUsuario">
+          Usuário
+        </strong>
+
+        <small id="emailUsuario">
+          Carregando...
+        </small>
       </div>
 
       <button
@@ -71,29 +158,42 @@
         class="botao-sair"
         type="button"
         title="Sair"
+        aria-label="Sair"
       >
         ↪
       </button>
     </div>
   </aside>
 
-  <!-- Todo o conteúdo que fica fora do menu -->
-  <div class="area-aplicacao">
+  <!-- ===================================================
+       ÁREA PRINCIPAL
+       =================================================== -->
 
+  <div
+    id="areaAplicacao"
+    class="area-aplicacao"
+  >
+
+    <!-- Cabeçalho -->
     <header class="cabecalho">
 
       <div class="grupo-titulo">
 
+        <!-- Aparece somente no celular -->
         <button
           id="botaoAbrirMenu"
           class="botao-abrir-menu"
           type="button"
+          aria-label="Abrir menu"
         >
           ☰
         </button>
 
-        <div>
-          <h1>Lei Seca</h1>
+        <div class="informacao-pagina">
+          <h1 id="tituloPagina">
+            Lei Seca
+          </h1>
+
           <span class="etiqueta-projeto">
             ● Projeto Santos
           </span>
@@ -103,18 +203,41 @@
       <div class="informacoes-estudo">
 
         <span class="situacao-estudo">
-          <i></i>
-          Em estudo
+          <i id="pontoSituacao"></i>
+
+          <span id="textoSituacao">
+            Em estudo
+          </span>
         </span>
 
-        <span class="cronometro">
-          ◷
-          <strong id="cronometro">00:00:00</strong>
-        </span>
+        <!-- Cronômetro e interruptor -->
+        <div class="controle-tempo">
+
+          <span class="cronometro">
+            ◷
+
+            <strong id="cronometro">
+              00:00:00
+            </strong>
+          </span>
+
+          <label
+            class="interruptor"
+            title="Ligar ou pausar cronômetro"
+          >
+            <input
+              id="controleCronometro"
+              type="checkbox"
+              checked
+            >
+
+            <span class="trilho-interruptor"></span>
+          </label>
+        </div>
 
         <button
           id="botaoNovoEstudo"
-          class="botao-principal"
+          class="botao-principal botao-novo-estudo"
           type="button"
         >
           + Novo estudo
@@ -122,138 +245,495 @@
       </div>
     </header>
 
-    <main class="estrutura-estudo">
+    <!-- =================================================
+         TELA: LEI SECA
+         ================================================= -->
 
-      <!-- Coluna que mostra as matérias e os artigos -->
-      <aside class="menu-artigos">
+    <section
+      id="telaLeiSeca"
+      class="tela-pagina"
+    >
 
-        <div class="caixa-pesquisa">
-          <span>⌕</span>
+      <main class="estrutura-estudo">
 
-          <input
-            id="campoPesquisa"
-            type="search"
-            placeholder="Buscar por assunto..."
-          >
-        </div>
+        <!-- Lista de matérias e artigos -->
+        <aside class="menu-artigos">
 
-        <div id="arvoreArtigos" class="arvore-artigos">
-        </div>
-      </aside>
+          <div class="caixa-pesquisa">
+            <span>⌕</span>
 
-      <!-- Coluna que mostra o conteúdo do artigo -->
-      <section class="conteudo-estudo">
-
-        <div class="caminho-artigo">
-
-          <p id="caminho">
-            Selecione um artigo
-          </p>
-
-          <span id="contadorArtigos">
-            0 de 0
-          </span>
-        </div>
-
-        <!-- Aparece quando não existem artigos -->
-        <div id="estadoVazio" class="estado-vazio">
-
-          <div class="icone-vazio">▤</div>
-
-          <h2>Nenhum artigo encontrado</h2>
-
-          <p>
-            Crie seu primeiro artigo em
-            “Gerenciar conteúdo”.
-          </p>
-
-          <button
-            id="botaoCriarPrimeiro"
-            class="botao-principal"
-            type="button"
-          >
-            + Criar artigo
-          </button>
-        </div>
-
-        <!-- Aparece quando existe um artigo -->
-        <article id="visualizacaoArtigo" hidden>
-
-          <section class="cartao lei">
-
-            <span class="etiqueta laranja">
-              Lei Seca
-            </span>
-
-            <h2 id="tituloArtigo"></h2>
-
-            <div id="textoLei" class="texto-lei"></div>
-
-            <div
-              id="caixaExplicacao"
-              class="caixa-explicacao"
+            <input
+              id="campoPesquisa"
+              type="search"
+              placeholder="Buscar por assunto..."
+              aria-label="Pesquisar artigos"
             >
-              <span class="lampada">♧</span>
+          </div>
 
-              <p id="textoExplicacao"></p>
-            </div>
-          </section>
+          <div
+            id="arvoreArtigos"
+            class="arvore-artigos"
+          ></div>
+        </aside>
 
-          <section
-            id="cartaoDetalhes"
-            class="cartao detalhes"
+        <!-- Conteúdo do artigo -->
+        <section class="conteudo-estudo">
+
+          <div class="caminho-artigo">
+
+            <p id="caminho">
+              Nenhum artigo selecionado
+            </p>
+
+            <span id="contadorArtigos">
+              0 de 0
+            </span>
+          </div>
+
+          <!-- Aparece quando não existem artigos -->
+          <div
+            id="estadoVazio"
+            class="estado-vazio"
           >
 
-            <span class="etiqueta azul">
-              ▣ Prazos e Penas
-            </span>
-
-            <div class="grade-detalhes">
-
-              <div>
-                <h3>Pena privativa de liberdade</h3>
-                <p id="textoPena"></p>
-              </div>
-
-              <div>
-                <h3>Multa</h3>
-                <p id="textoMulta"></p>
-              </div>
+            <div class="icone-vazio">
+              ▤
             </div>
-          </section>
 
-          <footer class="navegacao-artigos">
+            <h2>Nenhum artigo encontrado</h2>
+
+            <p>
+              Crie seu primeiro artigo em
+              “Gerenciar conteúdo”.
+            </p>
 
             <button
-              id="botaoAnterior"
-              class="botao-secundario"
-              type="button"
-            >
-              ← Anterior
-            </button>
-
-            <span id="progressoArtigo"></span>
-
-            <button
-              id="botaoProximo"
+              id="botaoCriarPrimeiro"
               class="botao-principal"
               type="button"
             >
-              Próximo →
+              + Criar artigo
             </button>
-          </footer>
+          </div>
+
+          <!-- Aparece quando existe um artigo -->
+          <article
+            id="visualizacaoArtigo"
+            class="visualizacao-artigo"
+            hidden
+          >
+
+            <section class="cartao lei">
+
+              <div class="cabecalho-card">
+
+                <span class="etiqueta laranja">
+                  Lei Seca
+                </span>
+
+                <span
+                  id="statusRevisaoArtigo"
+                  class="status-revisao"
+                >
+                  Revisão em 7 dias
+                </span>
+              </div>
+
+              <h2 id="tituloArtigo"></h2>
+
+              <div
+                id="textoLei"
+                class="texto-lei"
+              ></div>
+
+              <div
+                id="caixaExplicacao"
+                class="caixa-explicacao"
+              >
+                <span class="lampada">
+                  ♧
+                </span>
+
+                <p id="textoExplicacao"></p>
+              </div>
+            </section>
+
+            <section
+              id="cartaoDetalhes"
+              class="cartao detalhes"
+            >
+
+              <span class="etiqueta azul">
+                ▣ Prazos e Penas
+              </span>
+
+              <div class="grade-detalhes">
+
+                <div>
+                  <h3>
+                    Pena privativa de liberdade
+                  </h3>
+
+                  <p id="textoPena"></p>
+                </div>
+
+                <div>
+                  <h3>Multa</h3>
+
+                  <p id="textoMulta"></p>
+                </div>
+              </div>
+            </section>
+
+            <!-- Ações de estudo -->
+            <section class="acoes-estudo-card">
+
+              <div>
+                <h3>Registro de estudo</h3>
+
+                <p id="informacaoProximaRevisao">
+                  Este card será revisado em 7 dias.
+                </p>
+              </div>
+
+              <div class="botoes-estudo-card">
+
+                <button
+                  id="botaoRegistrarEstudo"
+                  class="botao-secundario"
+                  type="button"
+                >
+                  ✓ Marcar como estudado
+                </button>
+
+                <button
+                  id="botaoConcluirRevisao"
+                  class="botao-principal"
+                  type="button"
+                  hidden
+                >
+                  Concluir revisão
+                </button>
+              </div>
+            </section>
+
+            <!-- Anterior e próximo -->
+            <footer class="navegacao-artigos">
+
+              <button
+                id="botaoAnterior"
+                class="botao-secundario"
+                type="button"
+              >
+                ← Anterior
+              </button>
+
+              <span id="progressoArtigo"></span>
+
+              <button
+                id="botaoProximo"
+                class="botao-principal"
+                type="button"
+              >
+                Próximo →
+              </button>
+            </footer>
+          </article>
+        </section>
+      </main>
+    </section>
+
+    <!-- =================================================
+         TELA: REVISÕES
+         ================================================= -->
+
+    <section
+      id="telaRevisoes"
+      class="tela-pagina pagina-interna"
+      hidden
+    >
+
+      <div class="cabecalho-pagina-interna">
+
+        <div>
+          <p class="titulo-pequeno">
+            REVISÃO ESPAÇADA
+          </p>
+
+          <h2>Cards para revisar</h2>
+
+          <p>
+            Os cards aparecem aqui quando chega o dia da revisão.
+          </p>
+        </div>
+
+        <button
+          id="botaoAtualizarRevisoes"
+          class="botao-secundario"
+          type="button"
+        >
+          ↻ Atualizar
+        </button>
+      </div>
+
+      <!-- Resumo dos blocos -->
+      <div class="resumo-revisoes">
+
+        <article class="resumo-revisao bloco-7">
+          <span class="icone-resumo">7</span>
+
+          <div>
+            <strong id="contadorRevisao7">0</strong>
+            <small>Revisões de 7 dias</small>
+          </div>
         </article>
+
+        <article class="resumo-revisao bloco-15">
+          <span class="icone-resumo">15</span>
+
+          <div>
+            <strong id="contadorRevisao15">0</strong>
+            <small>Revisões de 15 dias</small>
+          </div>
+        </article>
+
+        <article class="resumo-revisao bloco-30">
+          <span class="icone-resumo">30</span>
+
+          <div>
+            <strong id="contadorRevisao30">0</strong>
+            <small>Revisões de 30 dias</small>
+          </div>
+        </article>
+      </div>
+
+      <!-- Blocos de revisão -->
+      <div class="blocos-revisao">
+
+        <section class="bloco-revisao">
+
+          <div class="cabecalho-bloco-revisao">
+            <div>
+              <span class="marcador-etapa etapa-7">
+                7 dias
+              </span>
+
+              <h3>Primeira revisão</h3>
+            </div>
+
+            <span id="totalBloco7">0 cards</span>
+          </div>
+
+          <div
+            id="listaRevisao7"
+            class="lista-revisoes"
+          ></div>
+        </section>
+
+        <section class="bloco-revisao">
+
+          <div class="cabecalho-bloco-revisao">
+            <div>
+              <span class="marcador-etapa etapa-15">
+                15 dias
+              </span>
+
+              <h3>Segunda revisão</h3>
+            </div>
+
+            <span id="totalBloco15">0 cards</span>
+          </div>
+
+          <div
+            id="listaRevisao15"
+            class="lista-revisoes"
+          ></div>
+        </section>
+
+        <section class="bloco-revisao">
+
+          <div class="cabecalho-bloco-revisao">
+            <div>
+              <span class="marcador-etapa etapa-30">
+                30 dias
+              </span>
+
+              <h3>Revisão final do ciclo</h3>
+            </div>
+
+            <span id="totalBloco30">0 cards</span>
+          </div>
+
+          <div
+            id="listaRevisao30"
+            class="lista-revisoes"
+          ></div>
+        </section>
+      </div>
+    </section>
+
+    <!-- =================================================
+         TELA: INSIGHTS
+         ================================================= -->
+
+    <section
+      id="telaInsights"
+      class="tela-pagina pagina-interna"
+      hidden
+    >
+
+      <div class="cabecalho-pagina-interna">
+
+        <div>
+          <p class="titulo-pequeno">
+            SEU DESEMPENHO
+          </p>
+
+          <h2>Insights de estudo</h2>
+
+          <p>
+            Acompanhe seu tempo e a quantidade de cards estudados.
+          </p>
+        </div>
+
+        <button
+          id="botaoAtualizarInsights"
+          class="botao-secundario"
+          type="button"
+        >
+          ↻ Atualizar dados
+        </button>
+      </div>
+
+      <!-- Indicadores principais -->
+      <div class="grade-indicadores">
+
+        <article class="indicador">
+          <span class="icone-indicador laranja">
+            ◷
+          </span>
+
+          <div>
+            <small>Tempo total estudado</small>
+
+            <strong id="tempoTotalEstudado">
+              00h 00min
+            </strong>
+          </div>
+        </article>
+
+        <article class="indicador">
+          <span class="icone-indicador azul">
+            ▤
+          </span>
+
+          <div>
+            <small>Cards criados</small>
+
+            <strong id="totalCardsCriados">
+              0
+            </strong>
+          </div>
+        </article>
+
+        <article class="indicador">
+          <span class="icone-indicador verde">
+            ✓
+          </span>
+
+          <div>
+            <small>Cards estudados</small>
+
+            <strong id="totalCardsEstudados">
+              0
+            </strong>
+          </div>
+        </article>
+
+        <article class="indicador">
+          <span class="icone-indicador roxo">
+            ↻
+          </span>
+
+          <div>
+            <small>Revisões pendentes</small>
+
+            <strong id="totalRevisoesPendentes">
+              0
+            </strong>
+          </div>
+        </article>
+      </div>
+
+      <!-- Gráficos -->
+      <div class="grade-graficos">
+
+        <section class="cartao-grafico">
+
+          <div class="titulo-grafico">
+            <div>
+              <h3>Cards criados</h3>
+              <p>Últimos 7 dias</p>
+            </div>
+          </div>
+
+          <div
+            id="graficoCardsCriados"
+            class="grafico-barras"
+          ></div>
+        </section>
+
+        <section class="cartao-grafico">
+
+          <div class="titulo-grafico">
+            <div>
+              <h3>Cards estudados</h3>
+              <p>Últimos 7 dias</p>
+            </div>
+          </div>
+
+          <div
+            id="graficoCardsEstudados"
+            class="grafico-barras"
+          ></div>
+        </section>
+      </div>
+
+      <!-- Linha do tempo -->
+      <section class="cartao-linha-tempo">
+
+        <div class="titulo-grafico">
+          <div>
+            <h3>Linha do tempo</h3>
+
+            <p>
+              Seus estudos e revisões mais recentes
+            </p>
+          </div>
+        </div>
+
+        <div
+          id="linhaTempoEstudos"
+          class="linha-tempo"
+        ></div>
       </section>
-    </main>
+    </section>
   </div>
 
-  <!-- Janela usada para cadastrar artigos -->
-  <dialog id="janelaGerenciar" class="janela-gerenciar">
+  <!-- ===================================================
+       JANELA PARA GERENCIAR CONTEÚDO
+       =================================================== -->
+
+  <dialog
+    id="janelaGerenciar"
+    class="janela-gerenciar"
+  >
 
     <div class="cabecalho-janela">
 
       <div>
         <small>ADMINISTRAÇÃO</small>
+
         <h2>Gerenciar conteúdo</h2>
       </div>
 
@@ -261,6 +741,7 @@
         id="botaoFecharGerenciar"
         class="botao-fechar"
         type="button"
+        aria-label="Fechar"
       >
         ×
       </button>
@@ -268,7 +749,7 @@
 
     <div class="conteudo-gerenciador">
 
-      <!-- Formulário -->
+      <!-- Formulário do artigo -->
       <section class="area-formulario">
 
         <h3 id="tituloFormulario">
@@ -277,8 +758,10 @@
 
         <form id="formularioArtigo">
 
-          <!-- Guarda o código do artigo durante a edição -->
-          <input id="idArtigo" type="hidden">
+          <input
+            id="idArtigo"
+            type="hidden"
+          >
 
           <div class="duas-colunas">
 
@@ -385,6 +868,15 @@
             >
           </label>
 
+          <div class="informacao-revisao-formulario">
+            <span>↻</span>
+
+            <p>
+              O primeiro ciclo de revisão será marcado
+              automaticamente para 7 dias depois da criação.
+            </p>
+          </div>
+
           <div class="botoes-formulario">
 
             <button
@@ -409,12 +901,16 @@
         </form>
       </section>
 
-      <!-- Lista dos artigos cadastrados -->
+      <!-- Lista de artigos cadastrados -->
       <section class="area-lista">
 
         <div class="titulo-lista">
+
           <h3>Artigos cadastrados</h3>
-          <span id="quantidadeSalva">0</span>
+
+          <span id="quantidadeSalva">
+            0
+          </span>
         </div>
 
         <div id="listaArtigosSalvos"></div>
@@ -422,7 +918,11 @@
     </div>
   </dialog>
 
-  <!-- Pequena mensagem que aparece no canto -->
-  <div id="aviso" class="aviso"></div>
+  <!-- Mensagem no canto da tela -->
+  <div
+    id="aviso"
+    class="aviso"
+    role="status"
+  ></div>
 </body>
 </html>
