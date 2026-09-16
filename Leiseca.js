@@ -509,6 +509,8 @@ async function iniciarCronometro() {
     return;
   }
 
+  elementos.controleCronometro.checked = true;
+
   estado.cronometroAtivo = true;
   estado.segundosSessao = 0;
   estado.inicioSessao = Date.now();
@@ -516,17 +518,20 @@ async function iniciarCronometro() {
   atualizarSituacaoCronometro(true);
   atualizarTextoCronometro();
 
-  const { data, error } =
-    await supabaseCliente
-      .from("sessoes_estudo")
-      .insert({
-        usuario_id: estado.usuario.id,
-        iniciado_em:
-          new Date().toISOString(),
-        duracao_segundos: 0
-      })
-      .select("id")
-      .single();
+  /*
+    Cria a sessão no Supabase no momento
+    em que a chave é ligada.
+  */
+
+  const { data, error } = await supabaseCliente
+    .from("sessoes_estudo")
+    .insert({
+      usuario_id: estado.usuario.id,
+      iniciado_em: new Date().toISOString(),
+      duracao_segundos: 0
+    })
+    .select("id")
+    .single();
 
   if (error) {
     console.error(
@@ -535,7 +540,7 @@ async function iniciarCronometro() {
     );
 
     mostrarAviso(
-      "O cronômetro iniciou, mas a sessão não pôde ser registrada.",
+      "O cronômetro começou, mas a sessão não pôde ser registrada.",
       true
     );
   } else {
@@ -550,39 +555,73 @@ async function iniciarCronometro() {
     estado.intervaloPersistencia
   );
 
-  estado.intervaloCronometro =
-    setInterval(
-      function () {
-        estado.segundosSessao =
-          Math.floor(
-            (
-              Date.now() -
-              estado.inicioSessao
-            ) / 1000
-          );
+  /*
+    Atualiza o relógio a cada segundo.
+  */
 
-        atualizarTextoCronometro();
-      },
-      1000
-    );
+  estado.intervaloCronometro = setInterval(
+    function () {
+      estado.segundosSessao = Math.floor(
+        (Date.now() - estado.inicioSessao) / 1000
+      );
 
-  estado.intervaloPersistencia =
-    setInterval(
-      function () {
-        atualizarSessaoNoBanco(false);
-      },
-      30000
-    );
+      atualizarTextoCronometro();
+    },
+    1000
+  );
+
+  /*
+    A cada 30 segundos, guarda uma cópia
+    do tempo no Supabase.
+  */
+
+  estado.intervaloPersistencia = setInterval(
+    function () {
+      atualizarSessaoNoBanco(false);
+    },
+    30000
+  );
 }
 
 async function pausarCronometro() {
+  await pararEstudo(false);
+}
+
+async function pararEstudo(
+  mostrarConfirmacao = true
+) {
+  elementos.controleCronometro.checked = false;
+
   if (!estado.cronometroAtivo) {
     atualizarSituacaoCronometro(false);
     return;
   }
 
+  elementos.botaoPararEstudo.disabled = true;
+
   await finalizarSessaoCronometro();
+
   atualizarSituacaoCronometro(false);
+
+  /*
+    Busca novamente as sessões para atualizar
+    o tempo mostrado nos Insights.
+  */
+
+  await carregarDadosAnaliticos();
+
+  if (estado.telaAtual === "insights") {
+    desenharInsights();
+  }
+
+  if (mostrarConfirmacao) {
+    mostrarAviso(
+      "Estudo encerrado e contabilizado: " +
+        transformarSegundosEmHorario(
+          estado.segundosSessao
+        )
+    );
+  }
 }
 
 async function finalizarSessaoCronometro() {
@@ -590,13 +629,9 @@ async function finalizarSessaoCronometro() {
     return;
   }
 
-  estado.segundosSessao =
-    Math.floor(
-      (
-        Date.now() -
-        estado.inicioSessao
-      ) / 1000
-    );
+  estado.segundosSessao = Math.floor(
+    (Date.now() - estado.inicioSessao) / 1000
+  );
 
   clearInterval(
     estado.intervaloCronometro
@@ -606,6 +641,11 @@ async function finalizarSessaoCronometro() {
     estado.intervaloPersistencia
   );
 
+  /*
+    Grava o tempo final e a hora em que
+    a sessão terminou.
+  */
+
   await atualizarSessaoNoBanco(true);
 
   estado.cronometroAtivo = false;
@@ -613,16 +653,13 @@ async function finalizarSessaoCronometro() {
   estado.inicioSessao = null;
 }
 
-async function atualizarSessaoNoBanco(
-  finalizar
-) {
+async function atualizarSessaoNoBanco(finalizar) {
   if (!estado.sessaoAtualId) {
     return;
   }
 
   const atualizacao = {
-    duracao_segundos:
-      estado.segundosSessao
+    duracao_segundos: estado.segundosSessao
   };
 
   if (finalizar) {
@@ -630,14 +667,10 @@ async function atualizarSessaoNoBanco(
       new Date().toISOString();
   }
 
-  const { error } =
-    await supabaseCliente
-      .from("sessoes_estudo")
-      .update(atualizacao)
-      .eq(
-        "id",
-        estado.sessaoAtualId
-      );
+  const { error } = await supabaseCliente
+    .from("sessoes_estudo")
+    .update(atualizacao)
+    .eq("id", estado.sessaoAtualId);
 
   if (error) {
     console.error(
@@ -647,20 +680,24 @@ async function atualizarSessaoNoBanco(
   }
 }
 
-function atualizarSituacaoCronometro(
-  ativo
-) {
+function atualizarSituacaoCronometro(ativo) {
   const situacao =
     elementos.textoSituacao.parentElement;
 
-  elementos.textoSituacao.textContent =
-    ativo
-      ? "Em estudo"
-      : "Pausado";
+  elementos.textoSituacao.textContent = ativo
+    ? "Em estudo"
+    : "Estudo parado";
 
   situacao.classList.toggle(
     "pausado",
     !ativo
+  );
+
+  elementos.botaoPararEstudo.disabled = !ativo;
+
+  elementos.botaoPararEstudo.setAttribute(
+    "aria-disabled",
+    String(!ativo)
   );
 }
 
@@ -669,6 +706,38 @@ function atualizarTextoCronometro() {
     transformarSegundosEmHorario(
       estado.segundosSessao
     );
+}
+
+async function iniciarNovoEstudo() {
+  /*
+    Se já existir um estudo, ele será encerrado
+    e contabilizado antes de preparar o próximo.
+  */
+
+  if (estado.cronometroAtivo) {
+    await pararEstudo(false);
+  }
+
+  estado.segundosSessao = 0;
+
+  atualizarTextoCronometro();
+
+  elementos.controleCronometro.checked = false;
+
+  atualizarSituacaoCronometro(false);
+
+  estado.artigoAtual = 0;
+  elementos.campoPesquisa.value = "";
+  estado.artigosFiltrados = [
+    ...estado.artigos
+  ];
+
+  desenharMenuArtigos();
+  mostrarArtigoAtual();
+
+  mostrarAviso(
+    "Novo estudo preparado. Ligue a chave para começar."
+  );
 }
 
 async function iniciarNovoEstudo() {
