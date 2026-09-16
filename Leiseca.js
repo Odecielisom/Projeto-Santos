@@ -258,7 +258,7 @@ async function iniciarSistema() {
       await supabaseCliente.auth.getSession();
 
     if (!resultado.data.session) {
-      window.location.href = "Login.html";
+      window.location.href = "index.html";
       return;
     }
 
@@ -1032,7 +1032,7 @@ async function sairDoSistema() {
     await supabaseCliente.auth.signOut();
   }
 
-  window.location.href = "Login.html";
+  window.location.href = "index.html";
 }
 
 /*
