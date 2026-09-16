@@ -1,82 +1,64 @@
-/**
- * Função principal que inicializa o Web App.
- * Retorna o arquivo principal (Leiseca.html) que irá incorporar os demais.
- */
+// Constante com a URL do seu App (atualize após o primeiro deploy)
+const APP_URL = ScriptApp.getService().getUrl();
+
 function doGet(e) {
-  const template = HtmlService.createTemplateFromFile('Leiseca');
-  return template.evaluate()
-    .setTitle('Estudos Lei Seca - Dashboard')
-    .addMetaTag('viewport', 'width=device-width, initial-scale=1')
-    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+  // Roteamento simples: se o parâmetro 'page' for 'app', carrega o dashboard, senão, o login.
+  if (e.parameter.page === 'app') {
+    return HtmlService.createTemplateFromFile('Leiseca').evaluate()
+      .setTitle('Dashboard | Lei Seca')
+      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+      .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+  }
+  
+  return HtmlService.createTemplateFromFile('Login').evaluate()
+    .setTitle('Login | Lei Seca')
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1');
 }
 
-/**
- * Função utilitária para incluir arquivos HTML/CSS/JS dentro de outros arquivos HTML.
- */
+// Função auxiliar para incluir CSS e JS nos arquivos HTML
 function include(filename) {
   return HtmlService.createHtmlOutputFromFile(filename).getContent();
 }
 
-/**
- * Simula a autenticação de usuário.
- */
-function authenticateUser(email, password) {
-  // Em um ambiente real, você validaria com dados de uma planilha ou banco.
-  if (email === "aluno@leiseca.com" && password === "123456") {
-    return { success: true, name: "Estudante", token: Utilities.getUuid() };
-  }
-  return { success: false, message: "E-mail ou senha incorretos." };
+function getAppUrl() {
+  return ScriptApp.getService().getUrl();
 }
 
-/**
- * Retorna os dados estruturados da Lei Seca.
- */
-function getStudyData() {
+// --- LÓGICA DE NEGÓCIO ---
+
+function autenticarUsuario(email, senha) {
+  // Mock de autenticação para fins de demonstração
+  if (email === "estudante@leiseca.com" && senha === "aprovado123") {
+    return { success: true, token: "mock_token_123" };
+  }
+  return { success: false, message: "Credenciais inválidas. Use estudante@leiseca.com / aprovado123" };
+}
+
+function getArtigos() {
+  // Banco de dados em memória (Mock) baseado na hierarquia solicitada
   return [
     {
-      id: "dp",
-      subject: "Direito Penal",
-      topics: [
-        {
-          id: "t1",
-          title: "Crimes contra o patrimônio",
-          articles: [
-            {
-              id: "art155",
-              number: "Art. 155",
-              title: "Furto",
-              text: "Subtrair, para si ou para outrem, coisa alheia móvel:",
-              penalty: "Pena - reclusão, de um a quatro anos, e multa.",
-              explanation: "O núcleo do tipo penal é 'subtrair' (tirar, apoderar-se). Exige o ânimo de assenhoramento definitivo (animus rem sibi habendi). Não há violência ou grave ameaça (diferença para o roubo).",
-              status: "pending"
-            },
-            {
-              id: "art157",
-              number: "Art. 157",
-              title: "Roubo",
-              text: "Subtrair coisa móvel alheia, para si ou para outrem, mediante grave ameaça ou violência a pessoa, ou depois de havê-la, por qualquer meio, reduzido à impossibilidade de resistência:",
-              penalty: "Pena - reclusão, de quatro a dez anos, e multa.",
-              explanation: "O crime de roubo é complexo, tutelando o patrimônio e a integridade física/liberdade da vítima. A violência pode ser física (vis corporalis) ou moral (grave ameaça).",
-              status: "pending"
-            }
-          ]
-        },
-        {
-          id: "t2",
-          title: "Crimes contra a pessoa",
-          articles: [
-            {
-              id: "art121",
-              number: "Art. 121",
-              title: "Homicídio simples",
-              text: "Matar alguem:",
-              penalty: "Pena - reclusão, de seis a vinte anos.",
-              explanation: "Proteção ao bem jurídico mais importante: a vida extrauterina. É um crime material que exige resultado naturalístico (morte).",
-              status: "reviewed"
-            }
-          ]
-        }
-      ]
+      id: 1,
+      materia: "Direito Penal",
+      topico: "Crimes contra o patrimônio",
+      artigo: "Art. 155",
+      titulo: "Furto",
+      texto: "Subtrair, para si ou para outrem, coisa alheia móvel:",
+      pena: "Reclusão, de um a quatro anos, e multa.",
+      explicacao: "O crime de furto exige a subtração do bem sem o uso de violência ou grave ameaça à pessoa. O termo 'coisa alheia móvel' abrange inclusive energia elétrica (Art. 155, § 3º).",
+      status: "revisar" // 'lido', 'revisar', 'novo'
+    },
+    {
+      id: 2,
+      materia: "Direito Penal",
+      topico: "Crimes contra o patrimônio",
+      artigo: "Art. 157",
+      titulo: "Roubo",
+      texto: "Subtrair coisa móvel alheia, para si ou para outrem, mediante grave ameaça ou violência a pessoa, ou depois de havê-la, por qualquer meio, reduzido à impossibilidade de resistência:",
+      pena: "Reclusão, de quatro a dez anos, e multa.",
+      explicacao: "Diferente do furto, o roubo é classificado como crime complexo, pois atinge dois bens jurídicos: o patrimônio e a integridade física/liberdade da vítima.",
+      status: "novo"
     }
   ];
 }
