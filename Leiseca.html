@@ -1,1 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Área de estudos de Lei Seca do Projeto Santos">
+  <title>Lei Seca | Projeto Santos</title>
+  <link rel="stylesheet" href="Leiseca.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="Leiseca.js" defer></script>
+</head>
+<body>
+  <div class="app-loading" id="appLoading"><span class="spinner"></span><p>Carregando seus estudos...</p></div>
+  <div class="mobile-overlay" id="mobileOverlay"></div>
 
+  <aside class="main-sidebar" id="mainSidebar">
+    <div class="logo"><span class="logo-mark">⚡</span><span>Projeto Santos</span></div>
+    <nav class="main-nav" aria-label="Navegação principal">
+      <p class="nav-label">ESTUDOS</p>
+      <button class="nav-item active" type="button"><span>▤</span><span>Lei Seca</span></button>
+      <p class="nav-label admin-label">ADMINISTRAÇÃO</p>
+      <button class="nav-item" id="openManagerButton" type="button"><span>⚙</span><span>Gerenciar conteúdo</span></button>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-card"><span class="user-avatar" id="userAvatar">U</span><span><strong id="userName">Usuário</strong><small id="userEmail">Modo demonstração</small></span></div>
+      <button class="logout-button" id="logoutButton" type="button" title="Sair" aria-label="Sair">↪</button>
+    </div>
+  </aside>
+
+  <div class="app-area">
+    <header class="topbar">
+      <div class="title-group">
+        <button class="menu-button" id="menuButton" type="button" aria-label="Abrir menu">☰</button>
+        <div><h1>Lei Seca</h1><span class="exam-tag">● Projeto Santos</span></div>
+      </div>
+      <div class="study-status">
+        <span class="status-pill"><i></i> Em estudo</span>
+        <span class="timer-pill">◷ <strong id="studyTimer">00:00:00</strong></span>
+        <button class="primary-button compact" id="newStudyButton" type="button">＋ Novo estudo</button>
+      </div>
+    </header>
+
+    <main class="study-layout">
+      <aside class="content-sidebar">
+        <div class="search-box"><span>⌕</span><input id="searchInput" type="search" placeholder="Buscar por assunto..." aria-label="Buscar conteúdo"></div>
+        <div class="article-tree" id="articleTree"></div>
+      </aside>
+
+      <section class="study-content">
+        <div class="breadcrumb-row">
+          <p id="breadcrumb">▤ Selecione um artigo</p>
+          <span id="articleCounter">0 de 0</span>
+        </div>
+
+        <div class="empty-state" id="emptyState">
+          <span>▤</span>
+          <h2>Nenhum conteúdo encontrado</h2>
+          <p>Crie seu primeiro artigo em “Gerenciar conteúdo”.</p>
+          <button class="primary-button" id="emptyCreateButton" type="button">＋ Criar artigo</button>
+        </div>
+
+        <article class="article-view" id="articleView" hidden>
+          <section class="law-card">
+            <span class="content-tag orange">Lei Seca</span>
+            <h2 id="articleTitle"></h2>
+            <div class="law-text" id="lawText"></div>
+            <div class="explanation-box" id="explanationBox"><span class="bulb">♧</span><p id="explanationText"></p></div>
+          </section>
+
+          <section class="details-card" id="detailsCard">
+            <span class="content-tag blue">▣ Prazos e Penas</span>
+            <div class="detail-grid">
+              <div><h3>Pena privativa de liberdade</h3><p id="penaltyText"></p></div>
+              <div><h3>Multa</h3><p id="fineText"></p></div>
+            </div>
+          </section>
+
+          <footer class="article-navigation">
+            <button class="secondary-button" id="previousButton" type="button">← Anterior</button>
+            <div class="progress-dots" id="progressDots" aria-hidden="true"></div>
+            <button class="primary-button" id="nextButton" type="button">Próximo →</button>
+          </footer>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <dialog class="manager-dialog" id="managerDialog">
+    <div class="dialog-header"><div><p class="eyebrow">Administração</p><h2>Gerenciar conteúdo</h2></div><button class="icon-button" id="closeManagerButton" type="button" aria-label="Fechar">×</button></div>
+    <div class="manager-grid">
+      <section class="form-section">
+        <h3 id="formTitle">Novo artigo</h3>
+        <form id="articleForm">
+          <input id="articleId" type="hidden">
+          <div class="form-grid two-columns">
+            <label>Matéria<input id="subjectInput" type="text" placeholder="Ex.: Direito Penal" required></label>
+            <label>Assunto<input id="topicInput" type="text" placeholder="Ex.: Crimes contra o patrimônio" required></label>
+          </div>
+          <div class="form-grid two-columns">
+            <label>Número do artigo<input id="numberInput" type="text" placeholder="Ex.: Art. 155" required></label>
+            <label>Título<input id="titleInput" type="text" placeholder="Ex.: Furto" required></label>
+          </div>
+          <label>Texto da lei<textarea id="lawInput" rows="5" placeholder="Digite o texto do artigo..." required></textarea></label>
+          <label>Explicação ou observação<textarea id="explanationInput" rows="3" placeholder="Sua explicação resumida..."></textarea></label>
+          <div class="form-grid two-columns">
+            <label>Prazo ou pena<input id="penaltyInput" type="text" placeholder="Ex.: Reclusão de 1 a 4 anos"></label>
+            <label>Multa<input id="fineInput" type="text" placeholder="Ex.: Sim"></label>
+          </div>
+          <label>Ordem de exibição<input id="orderInput" type="number" min="0" value="0"></label>
+          <div class="form-actions">
+            <button class="secondary-button" id="cancelEditButton" type="button" hidden>Cancelar edição</button>
+            <button class="primary-button" id="saveArticleButton" type="submit">Salvar artigo</button>
+          </div>
+          <p class="form-message" id="formMessage" role="status"></p>
+        </form>
+      </section>
+
+      <section class="saved-section">
+        <div class="saved-heading"><h3>Artigos cadastrados</h3><span id="savedCount">0</span></div>
+        <div class="saved-list" id="savedList"></div>
+      </section>
+    </div>
+  </dialog>
+
+  <div class="toast" id="toast" role="status"></div>
+</body>
+</html>
