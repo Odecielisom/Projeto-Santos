@@ -72,7 +72,7 @@ const idsElementos = [
   "emailUsuario",
   "letraUsuario",
   "botaoNovoEstudo",
-  "botaoPararEstudo"
+  "botaoPararEstudo",
   "cronometro",
   "controleCronometro",
   "textoSituacao",
@@ -737,36 +737,6 @@ async function iniciarNovoEstudo() {
 
   mostrarAviso(
     "Novo estudo preparado. Ligue a chave para começar."
-  );
-}
-
-async function iniciarNovoEstudo() {
-  if (estado.cronometroAtivo) {
-    await finalizarSessaoCronometro();
-  }
-
-  estado.segundosSessao = 0;
-
-  atualizarTextoCronometro();
-
-  elementos.controleCronometro.checked =
-    true;
-
-  estado.artigoAtual = 0;
-
-  elementos.campoPesquisa.value = "";
-
-  estado.artigosFiltrados = [
-    ...estado.artigos
-  ];
-
-  desenharMenuArtigos();
-  mostrarArtigoAtual();
-
-  await iniciarCronometro();
-
-  mostrarAviso(
-    "Novo estudo iniciado."
   );
 }
 
