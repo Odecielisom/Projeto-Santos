@@ -228,7 +228,6 @@
             <input
               id="controleCronometro"
               type="checkbox"
-              checked
             >
 
             <span class="trilho-interruptor"></span>
@@ -236,12 +235,16 @@
         </div>
 
         <button
-          id="botaoNovoEstudo"
-          class="botao-principal botao-novo-estudo"
-          type="button"
-        >
-          + Novo estudo
-        </button>
+  id="botaoPararEstudo"
+  class="botao-parar-estudo"
+  type="button"
+  title="Parar e contabilizar o estudo"
+  aria-label="Parar e contabilizar o estudo"
+  disabled
+>
+  <span aria-hidden="true">■</span>
+</button>
+        
       </div>
     </header>
 
