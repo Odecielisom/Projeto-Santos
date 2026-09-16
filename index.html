@@ -387,9 +387,9 @@
 
         if (resultado.error) {
           mostrarMensagem(
-            "E-mail ou senha incorretos.",
-            "erro"
-          );
+  "Erro do Supabase: " + resultado.error.message,
+  "erro"
+);
 
           botaoEntrar.disabled = false;
           botaoEntrar.textContent = "Entrar →";
