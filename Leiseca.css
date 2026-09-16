@@ -2177,3 +2177,680 @@ input[type="checkbox"] {
     font-size: 8px;
   }
 }
+
+
+
+
+/* =========================================================
+   ABAS DO GERENCIAMENTO
+   ========================================================= */
+
+.abas-gerenciamento {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 12px 22px;
+
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.aba-gerenciamento {
+  min-height: 42px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  padding: 0 18px;
+
+  color: #64748b;
+  background: transparent;
+
+  border: 1px solid transparent;
+  border-radius: 10px;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    color 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.aba-gerenciamento:hover {
+  color: #ea580c;
+  background: #fff7ed;
+}
+
+.aba-gerenciamento.ativa {
+  color: #ea580c;
+  background: #ffffff;
+  border-color: #fed7aa;
+
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.08);
+}
+
+.aba-gerenciamento span {
+  font-size: 17px;
+}
+
+
+/* =========================================================
+   PAINÉIS DO GERENCIAMENTO
+   ========================================================= */
+
+.painel-gerenciamento {
+  max-height: calc(100vh - 190px);
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.painel-gerenciamento[hidden] {
+  display: none !important;
+}
+
+#painelCards {
+  padding: 0;
+}
+
+.cabecalho-painel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 22px;
+}
+
+.cabecalho-painel h3 {
+  margin: 4px 0 6px;
+
+  color: #172033;
+
+  font-size: 22px;
+}
+
+.cabecalho-painel p {
+  margin: 0;
+
+  color: #64748b;
+
+  line-height: 1.5;
+}
+
+
+/* =========================================================
+   FORMULÁRIOS DA ESTRUTURA
+   ========================================================= */
+
+.grade-cadastro-estrutura {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.cartao-cadastro-estrutura {
+  padding: 20px;
+
+  background: #ffffff;
+
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.05);
+}
+
+.titulo-cadastro-estrutura {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  margin-bottom: 18px;
+}
+
+.numero-etapa {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #ffffff;
+  background: #f97316;
+
+  border-radius: 12px;
+
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.titulo-cadastro-estrutura h4 {
+  margin: 0 0 3px;
+
+  color: #172033;
+
+  font-size: 16px;
+}
+
+.titulo-cadastro-estrutura p {
+  margin: 0;
+
+  color: #94a3b8;
+
+  font-size: 12px;
+}
+
+.cartao-cadastro-estrutura form {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.cartao-cadastro-estrutura label {
+  margin-top: 4px;
+
+  color: #475569;
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.cartao-cadastro-estrutura input,
+.cartao-cadastro-estrutura select {
+  width: 100%;
+  min-height: 42px;
+
+  padding: 0 12px;
+
+  color: #172033;
+  background: #ffffff;
+
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+
+  font-family: inherit;
+  font-size: 14px;
+
+  outline: none;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.cartao-cadastro-estrutura input:focus,
+.cartao-cadastro-estrutura select:focus {
+  border-color: #f97316;
+
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.12);
+}
+
+.cartao-cadastro-estrutura select:disabled {
+  color: #94a3b8;
+  background: #f1f5f9;
+
+  cursor: not-allowed;
+}
+
+.botoes-estrutura {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+
+  margin-top: 10px;
+}
+
+.botoes-estrutura button {
+  min-height: 40px;
+}
+
+.mensagem-formulario {
+  min-height: 18px;
+  margin: 3px 0 0;
+
+  color: #dc2626;
+
+  font-size: 12px;
+}
+
+
+/* =========================================================
+   ESTRUTURA CADASTRADA
+   ========================================================= */
+
+.estrutura-cadastrada {
+  margin-top: 24px;
+  padding: 22px;
+
+  background: #ffffff;
+
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.05);
+}
+
+.cabecalho-estrutura-cadastrada {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+
+  padding-bottom: 18px;
+
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.cabecalho-estrutura-cadastrada h3 {
+  margin: 0 0 5px;
+
+  color: #172033;
+
+  font-size: 18px;
+}
+
+.cabecalho-estrutura-cadastrada p {
+  margin: 0;
+
+  color: #64748b;
+
+  font-size: 13px;
+}
+
+.contadores-estrutura {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.contadores-estrutura span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+
+  padding: 8px 11px;
+
+  color: #64748b;
+  background: #f8fafc;
+
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+
+  font-size: 12px;
+}
+
+.contadores-estrutura strong {
+  color: #f97316;
+
+  font-size: 14px;
+}
+
+
+/* =========================================================
+   ÁRVORE DE MATÉRIAS, ASSUNTOS E TÓPICOS
+   ========================================================= */
+
+.lista-estrutura {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  margin-top: 18px;
+}
+
+.item-materia-estrutura {
+  overflow: hidden;
+
+  background: #ffffff;
+
+  border: 1px solid #dbe3ec;
+  border-radius: 14px;
+}
+
+.cabecalho-item-estrutura {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  padding: 13px 15px;
+}
+
+.item-materia-estrutura > .cabecalho-item-estrutura {
+  background: #fff7ed;
+  border-left: 4px solid #f97316;
+}
+
+.nome-item-estrutura {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  min-width: 0;
+
+  color: #172033;
+}
+
+.nome-item-estrutura span {
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #f97316;
+  background: #ffffff;
+
+  border-radius: 8px;
+}
+
+.nome-item-estrutura strong {
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lista-assuntos-estrutura {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  padding: 12px 14px 14px 32px;
+}
+
+.item-assunto-estrutura {
+  overflow: hidden;
+
+  background: #f8fafc;
+
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+}
+
+.item-assunto-estrutura > .cabecalho-item-estrutura {
+  padding: 11px 13px;
+
+  border-left: 3px solid #3b82f6;
+}
+
+.lista-topicos-estrutura {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+
+  padding: 5px 12px 12px 29px;
+}
+
+.item-topico-estrutura {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+
+  padding: 10px 12px;
+
+  background: #ffffff;
+
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+}
+
+.item-topico-estrutura .nome-item-estrutura span {
+  width: 26px;
+  height: 26px;
+  flex-basis: 26px;
+
+  color: #16a34a;
+  background: #f0fdf4;
+}
+
+.acoes-item-estrutura {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  flex-shrink: 0;
+}
+
+.acoes-item-estrutura button {
+  min-height: 32px;
+
+  padding: 0 10px;
+
+  color: #475569;
+  background: #ffffff;
+
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.acoes-item-estrutura button:hover {
+  color: #ea580c;
+  border-color: #fdba74;
+}
+
+.acoes-item-estrutura button.excluir {
+  color: #dc2626;
+}
+
+.acoes-item-estrutura button.excluir:hover {
+  color: #ffffff;
+  background: #dc2626;
+  border-color: #dc2626;
+}
+
+.lista-vazia-estrutura {
+  padding: 30px;
+
+  color: #94a3b8;
+  background: #f8fafc;
+
+  border: 1px dashed #cbd5e1;
+  border-radius: 12px;
+
+  text-align: center;
+}
+
+
+/* =========================================================
+   SELEÇÃO DA ESTRUTURA DO CARD
+   ========================================================= */
+
+.grupo-estrutura-card {
+  margin-bottom: 20px;
+  padding: 16px;
+
+  background: #fff7ed;
+
+  border: 1px solid #fed7aa;
+  border-radius: 13px;
+}
+
+.grupo-estrutura-card h4 {
+  margin: 0 0 13px;
+
+  color: #9a3412;
+
+  font-size: 14px;
+}
+
+.tres-colunas {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.area-formulario select {
+  width: 100%;
+  min-height: 42px;
+
+  padding: 0 12px;
+
+  color: #172033;
+  background: #ffffff;
+
+  border: 1px solid #cbd5e1;
+  border-radius: 9px;
+
+  font-family: inherit;
+  font-size: 13px;
+
+  outline: none;
+}
+
+.area-formulario select:focus {
+  border-color: #f97316;
+
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.12);
+}
+
+.area-formulario select:disabled {
+  color: #94a3b8;
+  background: #f1f5f9;
+
+  cursor: not-allowed;
+}
+
+.explicacao-formulario {
+  margin: -2px 0 18px;
+
+  color: #64748b;
+
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+
+/* =========================================================
+   AJUSTES DA JANELA
+   ========================================================= */
+
+.janela-gerenciar {
+  width: min(1180px, calc(100vw - 32px));
+  max-width: 1180px;
+  max-height: calc(100vh - 32px);
+
+  padding: 0;
+
+  overflow: hidden;
+}
+
+#painelCards .conteudo-gerenciador {
+  min-height: 620px;
+}
+
+#painelCards .titulo-lista p {
+  margin: 4px 0 0;
+
+  color: #94a3b8;
+
+  font-size: 12px;
+}
+
+
+/* =========================================================
+   RESPONSIVIDADE DA NOVA JANELA
+   ========================================================= */
+
+@media (max-width: 1050px) {
+  .grade-cadastro-estrutura {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .cartao-cadastro-estrutura:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .tres-colunas {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .tres-colunas label:last-child {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 760px) {
+  .abas-gerenciamento {
+    padding: 10px;
+  }
+
+  .aba-gerenciamento {
+    flex: 1;
+
+    padding: 0 10px;
+
+    font-size: 12px;
+  }
+
+  .painel-gerenciamento {
+    max-height: calc(100vh - 170px);
+    padding: 16px;
+  }
+
+  #painelCards {
+    padding: 0;
+  }
+
+  .grade-cadastro-estrutura {
+    grid-template-columns: 1fr;
+  }
+
+  .cartao-cadastro-estrutura:last-child {
+    grid-column: auto;
+  }
+
+  .cabecalho-estrutura-cadastrada {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .contadores-estrutura {
+    width: 100%;
+
+    flex-wrap: wrap;
+  }
+
+  .lista-assuntos-estrutura {
+    padding-left: 14px;
+  }
+
+  .lista-topicos-estrutura {
+    padding-left: 14px;
+  }
+
+  .cabecalho-item-estrutura,
+  .item-topico-estrutura {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .acoes-item-estrutura {
+    width: 100%;
+
+    justify-content: flex-end;
+  }
+
+  .tres-colunas {
+    grid-template-columns: 1fr;
+  }
+
+  .tres-colunas label:last-child {
+    grid-column: auto;
+  }
+}
