@@ -2854,3 +2854,11 @@ input[type="checkbox"] {
     grid-column: auto;
   }
 }
+
+/* Tópicos exibidos no menu dos artigos */
+
+.titulo-topico {
+  padding-left: 42px;
+  color: #64748b;
+  font-size: 12px;
+}
