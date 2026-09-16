@@ -2093,6 +2093,54 @@ input[type="checkbox"] {
     grid-template-columns: 1fr;
   }
 
+   /* =========================================================
+   BOTÃO VERMELHO PARA PARAR O ESTUDO
+   ========================================================= */
+
+.botao-parar-estudo {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #ffffff;
+  background: #ef4444;
+  border: none;
+  border-radius: 50%;
+
+  font-size: 13px;
+  cursor: pointer;
+
+  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.25);
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.botao-parar-estudo:hover:not(:disabled) {
+  background: #dc2626;
+  transform: scale(1.06);
+}
+
+.botao-parar-estudo:active:not(:disabled) {
+  transform: scale(0.94);
+}
+
+.botao-parar-estudo:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.botao-parar-estudo span {
+  display: block;
+  line-height: 1;
+}
   .lista-revisoes {
     grid-template-columns: 1fr;
   }
