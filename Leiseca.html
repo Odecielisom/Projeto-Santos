@@ -816,38 +816,431 @@
        JANELA PARA GERENCIAR CONTEÚDO
        =================================================== -->
 
-  <dialog
-    id="janelaGerenciar"
-    class="janela-gerenciar"
+  <!-- ===================================================
+     JANELA PARA GERENCIAR CONTEÚDO
+     =================================================== -->
+
+<dialog
+  id="janelaGerenciar"
+  class="janela-gerenciar"
+>
+  <!-- Cabeçalho da janela -->
+
+  <div class="cabecalho-janela">
+
+    <div>
+      <small>ADMINISTRAÇÃO</small>
+
+      <h2>Gerenciar conteúdo</h2>
+    </div>
+
+    <button
+      id="botaoFecharGerenciar"
+      class="botao-fechar"
+      type="button"
+      aria-label="Fechar"
+    >
+      ×
+    </button>
+  </div>
+
+  <!-- Abas da janela -->
+
+  <div class="abas-gerenciamento">
+
+    <button
+      id="abaEstrutura"
+      class="aba-gerenciamento ativa"
+      type="button"
+    >
+      <span>▦</span>
+      Organizar estrutura
+    </button>
+
+    <button
+      id="abaCards"
+      class="aba-gerenciamento"
+      type="button"
+    >
+      <span>▤</span>
+      Adicionar card
+    </button>
+  </div>
+
+  <!-- =================================================
+       PAINEL: ORGANIZAR ESTRUTURA
+       ================================================= -->
+
+  <section
+    id="painelEstrutura"
+    class="painel-gerenciamento"
   >
 
-    <div class="cabecalho-janela">
+    <div class="cabecalho-painel">
 
       <div>
-        <small>ADMINISTRAÇÃO</small>
+        <p class="titulo-pequeno">
+          ORGANIZAÇÃO
+        </p>
 
-        <h2>Gerenciar conteúdo</h2>
+        <h3>Estrutura dos estudos</h3>
+
+        <p>
+          Primeiro crie as matérias, depois os assuntos
+          e, por último, os tópicos.
+        </p>
+      </div>
+    </div>
+
+    <!-- Formulários da estrutura -->
+
+    <div class="grade-cadastro-estrutura">
+
+      <!-- Cadastrar matéria -->
+
+      <article class="cartao-cadastro-estrutura">
+
+        <div class="titulo-cadastro-estrutura">
+
+          <span class="numero-etapa">
+            1
+          </span>
+
+          <div>
+            <h4>Matéria</h4>
+
+            <p>
+              Exemplo: Direito Penal
+            </p>
+          </div>
+        </div>
+
+        <form id="formularioMateria">
+
+          <input
+            id="idMateriaEdicao"
+            type="hidden"
+          >
+
+          <label for="campoNomeMateria">
+            Nome da matéria
+          </label>
+
+          <input
+            id="campoNomeMateria"
+            type="text"
+            placeholder="Ex.: Direito Penal"
+            required
+          >
+
+          <label for="campoOrdemMateria">
+            Ordem
+          </label>
+
+          <input
+            id="campoOrdemMateria"
+            type="number"
+            min="0"
+            value="0"
+          >
+
+          <div class="botoes-estrutura">
+
+            <button
+              id="botaoCancelarMateria"
+              class="botao-secundario"
+              type="button"
+              hidden
+            >
+              Cancelar
+            </button>
+
+            <button
+              id="botaoSalvarMateria"
+              class="botao-principal"
+              type="submit"
+            >
+              Salvar matéria
+            </button>
+          </div>
+
+          <p
+            id="mensagemMateria"
+            class="mensagem-formulario"
+          ></p>
+        </form>
+      </article>
+
+      <!-- Cadastrar assunto -->
+
+      <article class="cartao-cadastro-estrutura">
+
+        <div class="titulo-cadastro-estrutura">
+
+          <span class="numero-etapa">
+            2
+          </span>
+
+          <div>
+            <h4>Assunto</h4>
+
+            <p>
+              Exemplo: Aplicação da Lei Penal
+            </p>
+          </div>
+        </div>
+
+        <form id="formularioAssunto">
+
+          <input
+            id="idAssuntoEdicao"
+            type="hidden"
+          >
+
+          <label for="selectMateriaAssunto">
+            Escolha a matéria
+          </label>
+
+          <select
+            id="selectMateriaAssunto"
+            required
+          >
+            <option value="">
+              Selecione uma matéria
+            </option>
+          </select>
+
+          <label for="campoNomeAssunto">
+            Nome do assunto
+          </label>
+
+          <input
+            id="campoNomeAssunto"
+            type="text"
+            placeholder="Ex.: Aplicação da Lei Penal"
+            required
+          >
+
+          <label for="campoOrdemAssunto">
+            Ordem
+          </label>
+
+          <input
+            id="campoOrdemAssunto"
+            type="number"
+            min="0"
+            value="0"
+          >
+
+          <div class="botoes-estrutura">
+
+            <button
+              id="botaoCancelarAssunto"
+              class="botao-secundario"
+              type="button"
+              hidden
+            >
+              Cancelar
+            </button>
+
+            <button
+              id="botaoSalvarAssunto"
+              class="botao-principal"
+              type="submit"
+            >
+              Salvar assunto
+            </button>
+          </div>
+
+          <p
+            id="mensagemAssunto"
+            class="mensagem-formulario"
+          ></p>
+        </form>
+      </article>
+
+      <!-- Cadastrar tópico -->
+
+      <article class="cartao-cadastro-estrutura">
+
+        <div class="titulo-cadastro-estrutura">
+
+          <span class="numero-etapa">
+            3
+          </span>
+
+          <div>
+            <h4>Tópico</h4>
+
+            <p>
+              Exemplo: Artigos e prazos
+            </p>
+          </div>
+        </div>
+
+        <form id="formularioTopico">
+
+          <input
+            id="idTopicoEdicao"
+            type="hidden"
+          >
+
+          <label for="selectMateriaTopico">
+            Escolha a matéria
+          </label>
+
+          <select
+            id="selectMateriaTopico"
+            required
+          >
+            <option value="">
+              Selecione uma matéria
+            </option>
+          </select>
+
+          <label for="selectAssuntoTopico">
+            Escolha o assunto
+          </label>
+
+          <select
+            id="selectAssuntoTopico"
+            required
+            disabled
+          >
+            <option value="">
+              Primeiro selecione uma matéria
+            </option>
+          </select>
+
+          <label for="campoNomeTopico">
+            Nome do tópico
+          </label>
+
+          <input
+            id="campoNomeTopico"
+            type="text"
+            placeholder="Ex.: Artigos e prazos"
+            required
+          >
+
+          <label for="campoOrdemTopico">
+            Ordem
+          </label>
+
+          <input
+            id="campoOrdemTopico"
+            type="number"
+            min="0"
+            value="0"
+          >
+
+          <div class="botoes-estrutura">
+
+            <button
+              id="botaoCancelarTopico"
+              class="botao-secundario"
+              type="button"
+              hidden
+            >
+              Cancelar
+            </button>
+
+            <button
+              id="botaoSalvarTopico"
+              class="botao-principal"
+              type="submit"
+            >
+              Salvar tópico
+            </button>
+          </div>
+
+          <p
+            id="mensagemTopico"
+            class="mensagem-formulario"
+          ></p>
+        </form>
+      </article>
+    </div>
+
+    <!-- Estrutura já cadastrada -->
+
+    <section class="estrutura-cadastrada">
+
+      <div class="cabecalho-estrutura-cadastrada">
+
+        <div>
+          <h3>Estrutura cadastrada</h3>
+
+          <p>
+            Matérias, assuntos e tópicos disponíveis
+            para receber cards.
+          </p>
+        </div>
+
+        <div class="contadores-estrutura">
+
+          <span>
+            <strong id="quantidadeMaterias">
+              0
+            </strong>
+            matérias
+          </span>
+
+          <span>
+            <strong id="quantidadeAssuntos">
+              0
+            </strong>
+            assuntos
+          </span>
+
+          <span>
+            <strong id="quantidadeTopicos">
+              0
+            </strong>
+            tópicos
+          </span>
+        </div>
       </div>
 
-      <button
-        id="botaoFecharGerenciar"
-        class="botao-fechar"
-        type="button"
-        aria-label="Fechar"
+      <div
+        id="listaEstrutura"
+        class="lista-estrutura"
       >
-        ×
-      </button>
-    </div>
+        <p class="lista-vazia">
+          Nenhuma estrutura cadastrada.
+        </p>
+      </div>
+    </section>
+  </section>
+
+  <!-- =================================================
+       PAINEL: ADICIONAR CARD
+       ================================================= -->
+
+  <section
+    id="painelCards"
+    class="painel-gerenciamento"
+    hidden
+  >
 
     <div class="conteudo-gerenciador">
 
-      <!-- Formulário do artigo -->
+      <!-- Formulário do card -->
 
       <section class="area-formulario">
 
+        <p class="titulo-pequeno">
+          CARD DE ESTUDO
+        </p>
+
         <h3 id="tituloFormulario">
-          Novo artigo
+          Novo card
         </h3>
+
+        <p class="explicacao-formulario">
+          Escolha onde o card será colocado e depois
+          preencha seu conteúdo.
+        </p>
 
         <form id="formularioArtigo">
 
@@ -856,30 +1249,58 @@
             type="hidden"
           >
 
-          <div class="duas-colunas">
+          <!-- Seleção da estrutura -->
 
-            <label>
-              Matéria
+          <div class="grupo-estrutura-card">
 
-              <input
-                id="campoMateria"
-                type="text"
-                placeholder="Ex.: Direito Penal"
-                required
-              >
-            </label>
+            <h4>Onde este card será colocado?</h4>
 
-            <label>
-              Assunto
+            <div class="tres-colunas">
 
-              <input
-                id="campoAssunto"
-                type="text"
-                placeholder="Ex.: Crimes contra o patrimônio"
-                required
-              >
-            </label>
+              <label>
+                Matéria
+
+                <select
+                  id="campoMateria"
+                  required
+                >
+                  <option value="">
+                    Selecione uma matéria
+                  </option>
+                </select>
+              </label>
+
+              <label>
+                Assunto
+
+                <select
+                  id="campoAssunto"
+                  required
+                  disabled
+                >
+                  <option value="">
+                    Primeiro selecione uma matéria
+                  </option>
+                </select>
+              </label>
+
+              <label>
+                Tópico
+
+                <select
+                  id="campoTopico"
+                  required
+                  disabled
+                >
+                  <option value="">
+                    Primeiro selecione um assunto
+                  </option>
+                </select>
+              </label>
+            </div>
           </div>
+
+          <!-- Informações do card -->
 
           <div class="duas-colunas">
 
@@ -987,7 +1408,7 @@
               class="botao-principal"
               type="submit"
             >
-              Salvar artigo
+              Salvar card
             </button>
           </div>
 
@@ -995,13 +1416,19 @@
         </form>
       </section>
 
-      <!-- Lista de artigos cadastrados -->
+      <!-- Cards cadastrados -->
 
       <section class="area-lista">
 
         <div class="titulo-lista">
 
-          <h3>Artigos cadastrados</h3>
+          <div>
+            <h3>Cards cadastrados</h3>
+
+            <p>
+              Cards salvos na sua estrutura.
+            </p>
+          </div>
 
           <span id="quantidadeSalva">
             0
@@ -1011,7 +1438,8 @@
         <div id="listaArtigosSalvos"></div>
       </section>
     </div>
-  </dialog>
+  </section>
+</dialog>
 
   <!-- Mensagem apresentada no canto da tela -->
 
