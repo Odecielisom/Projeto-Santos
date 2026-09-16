@@ -1,254 +1,570 @@
-<script>
-  /*
-    CONFIGURAÇÃO DO SUPABASE
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
 
-    A chave abaixo é do tipo publishable.
-    Nunca coloque uma chave secret ou service_role aqui.
-  */
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
-  const SUPABASE_URL =
-    "https://gmhkrdtbsxniazoiqczx.supabase.co";
+  <title>Login | Projeto Santos</title>
 
-  const SUPABASE_ANON_KEY =
-    "sb_publishable_PPzbVeZRWekWKpmoth7tGw_ZC_w99F1";
+  <!-- Biblioteca responsável pela conexão com o Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  /*
-    Pegamos os elementos da tela.
-  */
+  <style>
+    :root {
+      --laranja: #f97316;
+      --laranja-escuro: #ea580c;
+      --laranja-claro: #fff7ed;
+      --cinza-escuro: #1f2937;
+      --cinza: #6b7280;
+      --cinza-claro: #f3f4f6;
+      --branco: #ffffff;
+    }
 
-  const formularioLogin =
-    document.getElementById("formularioLogin");
+    * {
+      box-sizing: border-box;
+    }
 
-  const botaoEntrar =
-    document.getElementById("botaoEntrar");
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      color: var(--cinza-escuro);
+      background:
+        radial-gradient(
+          circle at top left,
+          rgba(249, 115, 22, 0.16),
+          transparent 35%
+        ),
+        var(--cinza-claro);
+      font-family: Arial, Helvetica, sans-serif;
+    }
 
-  const mensagem =
-    document.getElementById("mensagem");
+    .container-login {
+      width: 100%;
+      max-width: 950px;
+      min-height: 560px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      overflow: hidden;
+      background: var(--branco);
+      border-radius: 25px;
+      box-shadow: 0 20px 60px rgba(31, 41, 55, 0.15);
+    }
 
-  /*
-    Verifica se a chave foi colocada.
-  */
+    .apresentacao {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 50px;
+      color: var(--branco);
+      background: linear-gradient(
+        145deg,
+        #fb923c,
+        var(--laranja),
+        var(--laranja-escuro)
+      );
+    }
 
-  const estaConfigurado =
-    SUPABASE_URL.includes("supabase.co") &&
-    !SUPABASE_ANON_KEY.includes("COLE_");
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 20px;
+      font-weight: bold;
+    }
 
-  /*
-    Cria a conexão com o Supabase.
-  */
+    .simbolo-logo {
+      width: 45px;
+      height: 45px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--laranja);
+      background: var(--branco);
+      border-radius: 12px;
+      font-size: 22px;
+    }
 
-  const supabaseCliente = estaConfigurado
-    ? window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_ANON_KEY,
-        {
-          auth: {
-            persistSession: true,
-            autoRefreshToken: true,
-            detectSessionInUrl: true
+    .texto-apresentacao h1 {
+      margin: 0 0 15px;
+      font-size: 48px;
+      line-height: 1.1;
+    }
+
+    .texto-apresentacao p {
+      margin: 0;
+      color: rgba(255, 255, 255, 0.85);
+      line-height: 1.6;
+    }
+
+    .area-formulario {
+      display: flex;
+      align-items: center;
+      padding: 50px;
+    }
+
+    .conteudo-formulario {
+      width: 100%;
+    }
+
+    .titulo-pequeno {
+      margin: 0 0 8px;
+      color: var(--laranja);
+      font-size: 13px;
+      font-weight: bold;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    h2 {
+      margin: 0 0 10px;
+      font-size: 32px;
+    }
+
+    .subtitulo {
+      margin: 0 0 30px;
+      color: var(--cinza);
+      line-height: 1.5;
+    }
+
+    .campo {
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    input {
+      width: 100%;
+      height: 50px;
+      padding: 0 15px;
+      border: 1px solid #d1d5db;
+      border-radius: 12px;
+      outline: none;
+      font-size: 15px;
+    }
+
+    input:focus {
+      border-color: var(--laranja);
+      box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.12);
+    }
+
+    .botao-entrar {
+      width: 100%;
+      height: 52px;
+      margin-top: 5px;
+      color: var(--branco);
+      background: var(--laranja);
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .botao-entrar:hover {
+      background: var(--laranja-escuro);
+    }
+
+    .botao-entrar:disabled {
+      opacity: 0.6;
+      cursor: wait;
+    }
+
+    .mensagem {
+      display: none;
+      margin-top: 16px;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .mensagem.erro {
+      display: block;
+      color: #991b1b;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+    }
+
+    .mensagem.aviso {
+      display: block;
+      color: #9a3412;
+      background: var(--laranja-claro);
+      border: 1px solid #fed7aa;
+    }
+
+    .rodape-login {
+      margin-top: 22px;
+      color: var(--cinza);
+      font-size: 12px;
+      text-align: center;
+    }
+
+    @media (max-width: 750px) {
+      .container-login {
+        grid-template-columns: 1fr;
+      }
+
+      .apresentacao {
+        min-height: 230px;
+        padding: 30px;
+      }
+
+      .texto-apresentacao h1 {
+        margin-top: 35px;
+        font-size: 34px;
+      }
+
+      .texto-apresentacao p {
+        display: none;
+      }
+
+      .area-formulario {
+        padding: 35px 30px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="container-login">
+
+    <!-- Parte laranja -->
+    <section class="apresentacao">
+
+      <div class="logo">
+        <span class="simbolo-logo">⚡</span>
+        <span>Projeto Santos</span>
+      </div>
+
+      <div class="texto-apresentacao">
+        <h1>Estude a lei de forma simples.</h1>
+
+        <p>
+          Organize artigos, prazos, penas e observações
+          em um ambiente preparado para seus estudos.
+        </p>
+      </div>
+    </section>
+
+    <!-- Parte do formulário -->
+    <section class="area-formulario">
+
+      <div class="conteudo-formulario">
+
+        <p class="titulo-pequeno">
+          Bem-vindo
+        </p>
+
+        <h2>Entre na sua conta</h2>
+
+        <p class="subtitulo">
+          Digite o e-mail e a senha cadastrados no Supabase.
+        </p>
+
+        <form id="formularioLogin">
+
+          <div class="campo">
+            <label for="email">E-mail</label>
+
+            <input
+              id="email"
+              type="email"
+              placeholder="seu@email.com"
+              autocomplete="email"
+              required
+            >
+          </div>
+
+          <div class="campo">
+            <label for="senha">Senha</label>
+
+            <input
+              id="senha"
+              type="password"
+              placeholder="Digite sua senha"
+              autocomplete="current-password"
+              required
+            >
+          </div>
+
+          <button
+            id="botaoEntrar"
+            class="botao-entrar"
+            type="submit"
+          >
+            Entrar →
+          </button>
+
+          <p
+            id="mensagem"
+            class="mensagem"
+            role="alert"
+          ></p>
+        </form>
+
+        <p class="rodape-login">
+          Acesso protegido pelo Supabase
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    /*
+      CONFIGURAÇÃO DO SUPABASE
+    */
+
+    const SUPABASE_URL =
+      "https://gmhkrdtbsxniazoiqczx.supabase.co";
+
+    const SUPABASE_ANON_KEY =
+      "sb_publishable_PPzbVeZRWekWKpmoth7tGw_ZC_w99F1";
+
+    /*
+      Elementos da tela
+    */
+
+    const formularioLogin =
+      document.getElementById("formularioLogin");
+
+    const botaoEntrar =
+      document.getElementById("botaoEntrar");
+
+    const mensagem =
+      document.getElementById("mensagem");
+
+    const campoEmail =
+      document.getElementById("email");
+
+    const campoSenha =
+      document.getElementById("senha");
+
+    /*
+      Verifica se o Supabase foi configurado
+    */
+
+    const estaConfigurado =
+      SUPABASE_URL.includes("supabase.co") &&
+      SUPABASE_ANON_KEY.startsWith("sb_publishable_");
+
+    /*
+      Cria a conexão com o Supabase
+    */
+
+    const supabaseCliente = estaConfigurado
+      ? window.supabase.createClient(
+          SUPABASE_URL,
+          SUPABASE_ANON_KEY,
+          {
+            auth: {
+              persistSession: true,
+              autoRefreshToken: true,
+              detectSessionInUrl: true
+            }
           }
+        )
+      : null;
+
+    /*
+      Mostra mensagens na tela
+    */
+
+    function mostrarMensagem(texto, tipo) {
+      mensagem.textContent = texto;
+      mensagem.className = "mensagem " + tipo;
+    }
+
+    function limparMensagem() {
+      mensagem.textContent = "";
+      mensagem.className = "mensagem";
+    }
+
+    /*
+      Transforma os erros em mensagens fáceis
+    */
+
+    function traduzirErroSupabase(erro) {
+      const codigo = erro?.code || "";
+      const texto = erro?.message || "";
+
+      if (
+        codigo === "invalid_credentials" ||
+        texto.includes("Invalid login credentials")
+      ) {
+        return (
+          "O Supabase não reconheceu o e-mail e a senha. " +
+          "Confira os dados ou crie uma senha nova."
+        );
+      }
+
+      if (
+        codigo === "email_not_confirmed" ||
+        texto.includes("Email not confirmed")
+      ) {
+        return "O e-mail ainda não foi confirmado.";
+      }
+
+      if (
+        texto.includes("Invalid API key") ||
+        texto.includes("No API key")
+      ) {
+        return (
+          "A chave pública do Supabase está incorreta."
+        );
+      }
+
+      if (
+        texto.includes("Failed to fetch") ||
+        texto.includes("Network")
+      ) {
+        return (
+          "Não foi possível acessar o Supabase. " +
+          "Verifique sua conexão."
+        );
+      }
+
+      return "Erro do Supabase: " + texto;
+    }
+
+    /*
+      Tenta realizar o login
+    */
+
+    formularioLogin.addEventListener(
+      "submit",
+      async function (evento) {
+        evento.preventDefault();
+
+        limparMensagem();
+
+        if (!estaConfigurado || !supabaseCliente) {
+          mostrarMensagem(
+            "A conexão com o Supabase ainda não foi configurada.",
+            "aviso"
+          );
+
+          return;
         }
-      )
-    : null;
 
-  /*
-    Mostra uma mensagem na tela.
-  */
+        const email =
+          campoEmail.value.trim().toLowerCase();
 
-  function mostrarMensagem(texto, tipo) {
-    mensagem.textContent = texto;
-    mensagem.className = "mensagem " + tipo;
-  }
+        const senha =
+          campoSenha.value;
 
-  /*
-    Limpa a mensagem anterior.
-  */
+        if (!email || !senha) {
+          mostrarMensagem(
+            "Preencha o e-mail e a senha.",
+            "aviso"
+          );
 
-  function limparMensagem() {
-    mensagem.textContent = "";
-    mensagem.className = "mensagem";
-  }
+          return;
+        }
 
-  /*
-    Traduz os erros do Supabase para português.
-  */
+        botaoEntrar.disabled = true;
+        botaoEntrar.textContent = "Entrando...";
 
-  function traduzirErroSupabase(erro) {
-    const codigo = erro?.code || "";
-    const texto = erro?.message || "";
+        try {
+          const { data, error } =
+            await supabaseCliente.auth.signInWithPassword({
+              email: email,
+              password: senha
+            });
 
-    if (
-      codigo === "invalid_credentials" ||
-      texto.includes("Invalid login credentials")
-    ) {
-      return (
-        "O Supabase não reconheceu esse e-mail e essa senha. " +
-        "Confira se o usuário foi criado neste mesmo projeto."
-      );
-    }
+          if (error) {
+            console.error(
+              "Erro enviado pelo Supabase:",
+              error
+            );
 
-    if (
-      codigo === "email_not_confirmed" ||
-      texto.includes("Email not confirmed")
-    ) {
-      return (
-        "O e-mail ainda não foi confirmado no Supabase."
-      );
-    }
+            mostrarMensagem(
+              traduzirErroSupabase(error),
+              "erro"
+            );
 
-    if (
-      texto.includes("Invalid API key") ||
-      texto.includes("No API key")
-    ) {
-      return (
-        "A chave pública do Supabase está incorreta."
-      );
-    }
+            campoSenha.focus();
 
-    if (
-      texto.includes("Failed to fetch") ||
-      texto.includes("Network")
-    ) {
-      return (
-        "Não foi possível conversar com o Supabase. " +
-        "Verifique sua conexão com a internet."
-      );
-    }
+            return;
+          }
 
-    return "Erro do Supabase: " + texto;
-  }
+          if (!data.session) {
+            mostrarMensagem(
+              "O login foi aceito, mas a sessão não foi criada.",
+              "erro"
+            );
 
-  /*
-    Quando o usuário apertar o botão Entrar.
-  */
+            return;
+          }
 
-  formularioLogin.addEventListener(
-    "submit",
-    async function (evento) {
-      evento.preventDefault();
+          /*
+            Login realizado corretamente
+          */
 
-      limparMensagem();
+          window.location.replace("Leiseca.html");
+        } catch (erro) {
+          console.error(
+            "Erro inesperado:",
+            erro
+          );
 
-      if (!estaConfigurado || !supabaseCliente) {
-        mostrarMensagem(
-          "A conexão com o Supabase ainda não foi configurada.",
-          "aviso"
-        );
+          mostrarMensagem(
+            "Erro inesperado: " + erro.message,
+            "erro"
+          );
+        } finally {
+          botaoEntrar.disabled = false;
+          botaoEntrar.textContent = "Entrar →";
+        }
+      }
+    );
 
+    /*
+      Verifica se o usuário já está conectado
+    */
+
+    async function verificarUsuarioConectado() {
+      if (!supabaseCliente) {
         return;
       }
-
-      const campoEmail =
-        document.getElementById("email");
-
-      const campoSenha =
-        document.getElementById("senha");
-
-      const email =
-        campoEmail.value.trim().toLowerCase();
-
-      const senha =
-        campoSenha.value;
-
-      if (!email || !senha) {
-        mostrarMensagem(
-          "Preencha o e-mail e a senha.",
-          "aviso"
-        );
-
-        return;
-      }
-
-      botaoEntrar.disabled = true;
-      botaoEntrar.textContent = "Entrando...";
 
       try {
         const { data, error } =
-          await supabaseCliente.auth.signInWithPassword({
-            email: email,
-            password: senha
-          });
+          await supabaseCliente.auth.getSession();
 
         if (error) {
           console.error(
-            "Erro enviado pelo Supabase:",
+            "Erro ao verificar a sessão:",
             error
           );
 
-          mostrarMensagem(
-            traduzirErroSupabase(error),
-            "erro"
-          );
-
-          campoSenha.focus();
-
           return;
         }
 
-        if (!data.session) {
-          mostrarMensagem(
-            "O Supabase aceitou os dados, mas não criou uma sessão.",
-            "erro"
-          );
-
-          return;
+        if (data.session) {
+          window.location.replace("Leiseca.html");
         }
-
-        /*
-          Login realizado com sucesso.
-        */
-
-        window.location.replace("Leiseca.html");
       } catch (erro) {
         console.error(
-          "Erro inesperado durante o login:",
+          "Erro ao verificar usuário:",
           erro
         );
-
-        mostrarMensagem(
-          "Erro inesperado: " + erro.message,
-          "erro"
-        );
-      } finally {
-        botaoEntrar.disabled = false;
-        botaoEntrar.textContent = "Entrar →";
       }
     }
-  );
 
-  /*
-    Se o usuário já estiver conectado,
-    vai diretamente para a página Lei Seca.
-  */
-
-  async function verificarUsuarioConectado() {
-    if (!supabaseCliente) {
-      return;
-    }
-
-    try {
-      const { data, error } =
-        await supabaseCliente.auth.getSession();
-
-      if (error) {
-        console.error(
-          "Erro ao verificar a sessão:",
-          error
-        );
-
-        return;
-      }
-
-      if (data.session) {
-        window.location.replace("Leiseca.html");
-      }
-    } catch (erro) {
-      console.error(
-        "Não foi possível verificar a sessão:",
-        erro
-      );
-    }
-  }
-
-  verificarUsuarioConectado();
-</script>
+    verificarUsuarioConectado();
+  </script>
+</body>
+</html>
