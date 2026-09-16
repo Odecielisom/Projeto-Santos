@@ -1,9 +1,5 @@
 "use strict";
 
-/* =========================================================
-   CONFIGURAÇÃO DO SUPABASE
-   ========================================================= */
-
 const SUPABASE_URL =
   "https://gmhkrdtbsxniazoiqczx.supabase.co";
 
@@ -22,18 +18,20 @@ const supabaseCliente = window.supabase.createClient(
   }
 );
 
-/* =========================================================
-   ESTADO DO SISTEMA
-   ========================================================= */
-
 const estado = {
   usuario: null,
+  materias: [],
+  assuntos: [],
+  topicos: [],
   artigos: [],
   artigosFiltrados: [],
   historico: [],
   sessoes: [],
   artigoAtual: 0,
   artigoSendoEditado: null,
+  materiaSendoEditada: null,
+  assuntoSendoEditado: null,
+  topicoSendoEditado: null,
   telaAtual: "lei-seca",
   cronometroAtivo: false,
   inicioSessao: null,
@@ -42,10 +40,6 @@ const estado = {
   intervaloCronometro: null,
   intervaloPersistencia: null
 };
-
-/* =========================================================
-   ELEMENTOS DA TELA
-   ========================================================= */
 
 const elementos = {};
 
@@ -115,10 +109,43 @@ const idsElementos = [
   "graficoCardsCriados",
   "graficoCardsEstudados",
   "linhaTempoEstudos",
+  "abaEstrutura",
+  "abaCards",
+  "painelEstrutura",
+  "painelCards",
+  "formularioMateria",
+  "idMateriaEdicao",
+  "campoNomeMateria",
+  "campoOrdemMateria",
+  "botaoSalvarMateria",
+  "botaoCancelarMateria",
+  "mensagemMateria",
+  "formularioAssunto",
+  "idAssuntoEdicao",
+  "selectMateriaAssunto",
+  "campoNomeAssunto",
+  "campoOrdemAssunto",
+  "botaoSalvarAssunto",
+  "botaoCancelarAssunto",
+  "mensagemAssunto",
+  "formularioTopico",
+  "idTopicoEdicao",
+  "selectMateriaTopico",
+  "selectAssuntoTopico",
+  "campoNomeTopico",
+  "campoOrdemTopico",
+  "botaoSalvarTopico",
+  "botaoCancelarTopico",
+  "mensagemTopico",
+  "quantidadeMaterias",
+  "quantidadeAssuntos",
+  "quantidadeTopicos",
+  "listaEstrutura",
   "formularioArtigo",
   "idArtigo",
   "campoMateria",
   "campoAssunto",
+  "campoTopico",
   "campoNumero",
   "campoTitulo",
   "campoTextoLei",
@@ -134,10 +161,6 @@ const idsElementos = [
   "quantidadeSalva",
   "aviso"
 ];
-
-/* =========================================================
-   INÍCIO DO SISTEMA
-   ========================================================= */
 
 document.addEventListener(
   "DOMContentLoaded",
@@ -158,24 +181,21 @@ async function iniciarSistema() {
   }
 
   estado.usuario = data.session.user;
+
   mostrarUsuario(estado.usuario);
 
+  await carregarEstrutura();
   await carregarArtigos();
   await carregarDadosAnaliticos();
 
   atualizarQuantidadeRevisoes();
   desenharTudo();
 
-  /*
-  Ao abrir a página, o estudo começa parado.
-  O tempo somente começa quando a chave for ligada.
-*/
+  elementos.controleCronometro.checked = false;
+  estado.segundosSessao = 0;
 
-elementos.controleCronometro.checked = false;
-estado.segundosSessao = 0;
-
-atualizarTextoCronometro();
-atualizarSituacaoCronometro(false);
+  atualizarTextoCronometro();
+  atualizarSituacaoCronometro(false);
 }
 
 function guardarElementos() {
@@ -184,10 +204,6 @@ function guardarElementos() {
       document.getElementById(id);
   });
 }
-
-/* =========================================================
-   EVENTOS DOS BOTÕES
-   ========================================================= */
 
 function configurarEventos() {
   elementos.botaoAbrirMenu.addEventListener(
@@ -228,12 +244,81 @@ function configurarEventos() {
 
   elementos.botaoGerenciar.addEventListener(
     "click",
-    abrirGerenciador
+    function () {
+      abrirGerenciador("estrutura");
+    }
   );
 
   elementos.botaoCriarPrimeiro.addEventListener(
     "click",
-    abrirGerenciador
+    function () {
+      abrirGerenciador("cards");
+    }
+  );
+
+  elementos.abaEstrutura.addEventListener(
+    "click",
+    function () {
+      trocarAbaGerenciamento("estrutura");
+    }
+  );
+
+  elementos.abaCards.addEventListener(
+    "click",
+    function () {
+      trocarAbaGerenciamento("cards");
+    }
+  );
+
+  elementos.formularioMateria.addEventListener(
+    "submit",
+    salvarMateria
+  );
+
+  elementos.formularioAssunto.addEventListener(
+    "submit",
+    salvarAssunto
+  );
+
+  elementos.formularioTopico.addEventListener(
+    "submit",
+    salvarTopico
+  );
+
+  elementos.botaoCancelarMateria.addEventListener(
+    "click",
+    limparFormularioMateria
+  );
+
+  elementos.botaoCancelarAssunto.addEventListener(
+    "click",
+    limparFormularioAssunto
+  );
+
+  elementos.botaoCancelarTopico.addEventListener(
+    "click",
+    limparFormularioTopico
+  );
+
+  elementos.selectMateriaTopico.addEventListener(
+    "change",
+    function () {
+      preencherAssuntosDoTopico();
+    }
+  );
+
+  elementos.campoMateria.addEventListener(
+    "change",
+    function () {
+      preencherAssuntosDoCard();
+    }
+  );
+
+  elementos.campoAssunto.addEventListener(
+    "change",
+    function () {
+      preencherTopicosDoCard();
+    }
   );
 
   elementos.botaoFecharGerenciar.addEventListener(
@@ -259,22 +344,24 @@ function configurarEventos() {
   );
 
   elementos.controleCronometro.addEventListener(
-  "change",
-  async function () {
-    if (elementos.controleCronometro.checked) {
-      await iniciarCronometro();
-    } else {
-      await pararEstudo(false);
+    "change",
+    async function () {
+      if (
+        elementos.controleCronometro.checked
+      ) {
+        await iniciarCronometro();
+      } else {
+        await pararEstudo(false);
+      }
     }
-  }
-);
+  );
 
-elementos.botaoPararEstudo.addEventListener(
-  "click",
-  async function () {
-    await pararEstudo(true);
-  }
-);
+  elementos.botaoPararEstudo.addEventListener(
+    "click",
+    async function () {
+      await pararEstudo(true);
+    }
+  );
 
   elementos.campoPesquisa.addEventListener(
     "input",
@@ -356,10 +443,6 @@ elementos.botaoPararEstudo.addEventListener(
   );
 }
 
-/* =========================================================
-   NAVEGAÇÃO ENTRE TELAS
-   ========================================================= */
-
 async function trocarTela(tela) {
   estado.telaAtual = tela;
 
@@ -410,10 +493,6 @@ async function trocarTela(tela) {
 
   fecharMenuCelular();
 }
-
-/* =========================================================
-   MENU SANFONA
-   ========================================================= */
 
 function alternarMenuLateral() {
   const recolhido =
@@ -474,10 +553,6 @@ function fecharMenuCelular() {
   );
 }
 
-/* =========================================================
-   USUÁRIO
-   ========================================================= */
-
 function mostrarUsuario(usuario) {
   const email =
     usuario.email || "Usuário";
@@ -500,10 +575,6 @@ async function sairDoSistema() {
   window.location.replace("index.html");
 }
 
-/* =========================================================
-   CRONÔMETRO E SESSÕES DE ESTUDO
-   ========================================================= */
-
 async function iniciarCronometro() {
   if (estado.cronometroAtivo) {
     return;
@@ -518,20 +589,17 @@ async function iniciarCronometro() {
   atualizarSituacaoCronometro(true);
   atualizarTextoCronometro();
 
-  /*
-    Cria a sessão no Supabase no momento
-    em que a chave é ligada.
-  */
-
-  const { data, error } = await supabaseCliente
-    .from("sessoes_estudo")
-    .insert({
-      usuario_id: estado.usuario.id,
-      iniciado_em: new Date().toISOString(),
-      duracao_segundos: 0
-    })
-    .select("id")
-    .single();
+  const { data, error } =
+    await supabaseCliente
+      .from("sessoes_estudo")
+      .insert({
+        usuario_id: estado.usuario.id,
+        iniciado_em:
+          new Date().toISOString(),
+        duracao_segundos: 0
+      })
+      .select("id")
+      .single();
 
   if (error) {
     console.error(
@@ -540,7 +608,7 @@ async function iniciarCronometro() {
     );
 
     mostrarAviso(
-      "O cronômetro começou, mas a sessão não pôde ser registrada.",
+      "O cronômetro iniciou, mas a sessão não pôde ser registrada.",
       true
     );
   } else {
@@ -555,32 +623,29 @@ async function iniciarCronometro() {
     estado.intervaloPersistencia
   );
 
-  /*
-    Atualiza o relógio a cada segundo.
-  */
+  estado.intervaloCronometro =
+    setInterval(
+      function () {
+        estado.segundosSessao =
+          Math.floor(
+            (
+              Date.now() -
+              estado.inicioSessao
+            ) / 1000
+          );
 
-  estado.intervaloCronometro = setInterval(
-    function () {
-      estado.segundosSessao = Math.floor(
-        (Date.now() - estado.inicioSessao) / 1000
-      );
+        atualizarTextoCronometro();
+      },
+      1000
+    );
 
-      atualizarTextoCronometro();
-    },
-    1000
-  );
-
-  /*
-    A cada 30 segundos, guarda uma cópia
-    do tempo no Supabase.
-  */
-
-  estado.intervaloPersistencia = setInterval(
-    function () {
-      atualizarSessaoNoBanco(false);
-    },
-    30000
-  );
+  estado.intervaloPersistencia =
+    setInterval(
+      function () {
+        atualizarSessaoNoBanco(false);
+      },
+      30000
+    );
 }
 
 async function pausarCronometro() {
@@ -590,23 +655,20 @@ async function pausarCronometro() {
 async function pararEstudo(
   mostrarConfirmacao = true
 ) {
-  elementos.controleCronometro.checked = false;
+  elementos.controleCronometro.checked =
+    false;
 
   if (!estado.cronometroAtivo) {
     atualizarSituacaoCronometro(false);
     return;
   }
 
-  elementos.botaoPararEstudo.disabled = true;
+  elementos.botaoPararEstudo.disabled =
+    true;
 
   await finalizarSessaoCronometro();
 
   atualizarSituacaoCronometro(false);
-
-  /*
-    Busca novamente as sessões para atualizar
-    o tempo mostrado nos Insights.
-  */
 
   await carregarDadosAnaliticos();
 
@@ -629,9 +691,13 @@ async function finalizarSessaoCronometro() {
     return;
   }
 
-  estado.segundosSessao = Math.floor(
-    (Date.now() - estado.inicioSessao) / 1000
-  );
+  estado.segundosSessao =
+    Math.floor(
+      (
+        Date.now() -
+        estado.inicioSessao
+      ) / 1000
+    );
 
   clearInterval(
     estado.intervaloCronometro
@@ -641,11 +707,6 @@ async function finalizarSessaoCronometro() {
     estado.intervaloPersistencia
   );
 
-  /*
-    Grava o tempo final e a hora em que
-    a sessão terminou.
-  */
-
   await atualizarSessaoNoBanco(true);
 
   estado.cronometroAtivo = false;
@@ -653,13 +714,16 @@ async function finalizarSessaoCronometro() {
   estado.inicioSessao = null;
 }
 
-async function atualizarSessaoNoBanco(finalizar) {
+async function atualizarSessaoNoBanco(
+  finalizar
+) {
   if (!estado.sessaoAtualId) {
     return;
   }
 
   const atualizacao = {
-    duracao_segundos: estado.segundosSessao
+    duracao_segundos:
+      estado.segundosSessao
   };
 
   if (finalizar) {
@@ -667,10 +731,14 @@ async function atualizarSessaoNoBanco(finalizar) {
       new Date().toISOString();
   }
 
-  const { error } = await supabaseCliente
-    .from("sessoes_estudo")
-    .update(atualizacao)
-    .eq("id", estado.sessaoAtualId);
+  const { error } =
+    await supabaseCliente
+      .from("sessoes_estudo")
+      .update(atualizacao)
+      .eq(
+        "id",
+        estado.sessaoAtualId
+      );
 
   if (error) {
     console.error(
@@ -680,20 +748,24 @@ async function atualizarSessaoNoBanco(finalizar) {
   }
 }
 
-function atualizarSituacaoCronometro(ativo) {
+function atualizarSituacaoCronometro(
+  ativo
+) {
   const situacao =
     elementos.textoSituacao.parentElement;
 
-  elementos.textoSituacao.textContent = ativo
-    ? "Em estudo"
-    : "Estudo parado";
+  elementos.textoSituacao.textContent =
+    ativo
+      ? "Em estudo"
+      : "Estudo parado";
 
   situacao.classList.toggle(
     "pausado",
     !ativo
   );
 
-  elementos.botaoPararEstudo.disabled = !ativo;
+  elementos.botaoPararEstudo.disabled =
+    !ativo;
 
   elementos.botaoPararEstudo.setAttribute(
     "aria-disabled",
@@ -709,11 +781,6 @@ function atualizarTextoCronometro() {
 }
 
 async function iniciarNovoEstudo() {
-  /*
-    Se já existir um estudo, ele será encerrado
-    e contabilizado antes de preparar o próximo.
-  */
-
   if (estado.cronometroAtivo) {
     await pararEstudo(false);
   }
@@ -722,12 +789,14 @@ async function iniciarNovoEstudo() {
 
   atualizarTextoCronometro();
 
-  elementos.controleCronometro.checked = false;
+  elementos.controleCronometro.checked =
+    false;
 
   atualizarSituacaoCronometro(false);
 
   estado.artigoAtual = 0;
   elementos.campoPesquisa.value = "";
+
   estado.artigosFiltrados = [
     ...estado.artigos
   ];
@@ -793,1905 +862,374 @@ function transformarSegundosEmTexto(
   );
 }
 
-/* =========================================================
-   CARREGAMENTO DOS ARTIGOS
-   ========================================================= */
-
-async function carregarArtigos(
-  idPreferido = null
-) {
-  const { data, error } =
-    await supabaseCliente
-      .from("artigos")
+async function carregarEstrutura() {
+  const [
+    resultadoMaterias,
+    resultadoAssuntos,
+    resultadoTopicos
+  ] = await Promise.all([
+    supabaseCliente
+      .from("materias")
       .select("*")
-      .eq("ativo", true)
       .order(
         "ordem",
         { ascending: true }
       )
       .order(
-        "criado_em",
+        "nome",
         { ascending: true }
-      );
-
-  if (error) {
-    console.error(
-      "Erro ao carregar artigos:",
-      error
-    );
-
-    estado.artigos = [];
-    estado.artigosFiltrados = [];
-
-    mostrarAviso(
-      "Não foi possível carregar os artigos: " +
-      error.message,
-      true
-    );
-  } else {
-    estado.artigos =
-      data || [];
-
-    estado.artigosFiltrados = [
-      ...estado.artigos
-    ];
-  }
-
-  if (idPreferido) {
-    const posicao =
-      estado.artigosFiltrados.findIndex(
-        function (artigo) {
-          return (
-            artigo.id ===
-            idPreferido
-          );
-        }
-      );
-
-    estado.artigoAtual =
-      posicao >= 0
-        ? posicao
-        : 0;
-  } else if (
-    estado.artigoAtual >=
-    estado.artigosFiltrados.length
-  ) {
-    estado.artigoAtual = 0;
-  }
-
-  atualizarQuantidadeRevisoes();
-  desenharTudo();
-}
-
-function desenharTudo() {
-  desenharMenuArtigos();
-  mostrarArtigoAtual();
-  desenharListaGerenciamento();
-  desenharRevisoes();
-}
-
-/* =========================================================
-   MENU DE ARTIGOS
-   ========================================================= */
-
-function desenharMenuArtigos() {
-  elementos.arvoreArtigos
-    .replaceChildren();
-
-  if (
-    estado.artigosFiltrados.length === 0
-  ) {
-    const vazio =
-      document.createElement("p");
-
-    vazio.className =
-      "lista-vazia";
-
-    vazio.textContent =
-      "Nenhum artigo encontrado.";
-
-    elementos.arvoreArtigos
-      .appendChild(vazio);
-
-    return;
-  }
-
-  const grupos =
-    agruparArtigos(
-      estado.artigosFiltrados
-    );
-
-  Object.keys(grupos).forEach(
-    function (materia) {
-      const caixaMateria =
-        document.createElement(
-          "section"
-        );
-
-      const tituloMateria =
-        document.createElement(
-          "button"
-        );
-
-      tituloMateria.type =
-        "button";
-
-      tituloMateria.className =
-        "titulo-materia";
-
-      tituloMateria.textContent =
-        "▾ " + materia;
-
-      caixaMateria.appendChild(
-        tituloMateria
-      );
-
-      const conteudoMateria =
-        document.createElement("div");
-
-      Object.keys(
-        grupos[materia]
-      ).forEach(
-        function (assunto) {
-          const tituloAssunto =
-            document.createElement(
-              "button"
-            );
-
-          tituloAssunto.type =
-            "button";
-
-          tituloAssunto.className =
-            "titulo-assunto";
-
-          tituloAssunto.textContent =
-            "▾ " + assunto;
-
-          conteudoMateria.appendChild(
-            tituloAssunto
-          );
-
-          const conteudoAssunto =
-            document.createElement(
-              "div"
-            );
-
-          grupos[materia][assunto]
-            .forEach(
-              function (artigo) {
-                const posicao =
-                  estado.artigosFiltrados
-                    .findIndex(
-                      function (item) {
-                        return (
-                          item.id ===
-                          artigo.id
-                        );
-                      }
-                    );
-
-                const botao =
-                  document.createElement(
-                    "button"
-                  );
-
-                botao.type =
-                  "button";
-
-                botao.className =
-                  "botao-artigo";
-
-                botao.textContent =
-                  artigo.numero_artigo +
-                  " - " +
-                  artigo.titulo;
-
-                if (
-                  posicao ===
-                  estado.artigoAtual
-                ) {
-                  botao.classList.add(
-                    "ativo"
-                  );
-                }
-
-                botao.addEventListener(
-                  "click",
-                  function () {
-                    selecionarArtigo(
-                      posicao
-                    );
-                  }
-                );
-
-                conteudoAssunto
-                  .appendChild(botao);
-              }
-            );
-
-          tituloAssunto
-            .addEventListener(
-              "click",
-              function () {
-                alternarGrupo(
-                  tituloAssunto,
-                  conteudoAssunto
-                );
-              }
-            );
-
-          conteudoMateria
-            .appendChild(
-              conteudoAssunto
-            );
-        }
-      );
-
-      tituloMateria.addEventListener(
-        "click",
-        function () {
-          alternarGrupo(
-            tituloMateria,
-            conteudoMateria
-          );
-        }
-      );
-
-      caixaMateria.appendChild(
-        conteudoMateria
-      );
-
-      elementos.arvoreArtigos
-        .appendChild(
-          caixaMateria
-        );
-    }
-  );
-}
-
-function agruparArtigos(artigos) {
-  const grupos = {};
-
-  artigos.forEach(
-    function (artigo) {
-      if (!grupos[artigo.materia]) {
-        grupos[artigo.materia] = {};
-      }
-
-      if (
-        !grupos[artigo.materia][
-          artigo.assunto
-        ]
-      ) {
-        grupos[artigo.materia][
-          artigo.assunto
-        ] = [];
-      }
-
-      grupos[artigo.materia][
-        artigo.assunto
-      ].push(artigo);
-    }
-  );
-
-  return grupos;
-}
-
-function alternarGrupo(
-  botao,
-  conteudo
-) {
-  const esconder =
-    !conteudo.hidden;
-
-  conteudo.hidden =
-    esconder;
-
-  botao.textContent =
-    botao.textContent.replace(
-      esconder ? "▾" : "▸",
-      esconder ? "▸" : "▾"
-    );
-}
-
-/* =========================================================
-   EXIBIÇÃO DO ARTIGO
-   ========================================================= */
-
-function mostrarArtigoAtual() {
-  const artigo =
-    estado.artigosFiltrados[
-      estado.artigoAtual
-    ];
-
-  if (!artigo) {
-    elementos.estadoVazio.hidden =
-      false;
-
-    elementos.visualizacaoArtigo.hidden =
-      true;
-
-    elementos.caminho.textContent =
-      "Nenhum artigo selecionado";
-
-    elementos.contadorArtigos.textContent =
-      "0 de 0";
-
-    return;
-  }
-
-  elementos.estadoVazio.hidden =
-    true;
-
-  elementos.visualizacaoArtigo.hidden =
-    false;
-
-  elementos.caminho.textContent =
-    artigo.materia +
-    " › " +
-    artigo.assunto;
-
-  elementos.contadorArtigos.textContent =
-    (
-      estado.artigoAtual + 1
-    ) +
-    " de " +
-    estado.artigosFiltrados.length;
-
-  elementos.tituloArtigo.textContent =
-    artigo.numero_artigo +
-    " - " +
-    artigo.titulo;
-
-  elementos.textoLei.textContent =
-    artigo.texto_lei;
-
-  elementos.textoExplicacao.textContent =
-    artigo.explicacao || "";
-
-  elementos.caixaExplicacao.hidden =
-    !artigo.explicacao;
-
-  elementos.textoPena.textContent =
-    artigo.pena ||
-    "Não informado";
-
-  elementos.textoMulta.textContent =
-    artigo.multa ||
-    "Não informado";
-
-  elementos.cartaoDetalhes.hidden =
-    !artigo.pena &&
-    !artigo.multa;
-
-  elementos.botaoAnterior.disabled =
-    estado.artigoAtual === 0;
-
-  elementos.botaoProximo.disabled =
-    estado.artigoAtual ===
-    estado.artigosFiltrados.length - 1;
-
-  elementos.progressoArtigo.textContent =
-    "Artigo " +
-    (
-      estado.artigoAtual + 1
-    ) +
-    " de " +
-    estado.artigosFiltrados.length;
-
-  atualizarEstadoRevisaoArtigo(
-    artigo
-  );
-}
-
-function atualizarEstadoRevisaoArtigo(
-  artigo
-) {
-  const proximaRevisao =
-    new Date(
-      artigo.proxima_revisao
-    );
-
-  const agora =
-    new Date();
-
-  const disponivel =
-    proximaRevisao <= agora;
-
-  const etapa =
-    artigo.etapa_revisao || 7;
-
-  elementos.statusRevisaoArtigo
-    .className =
-      "status-revisao";
-
-  if (disponivel) {
-    elementos.statusRevisaoArtigo
-      .textContent =
-        "Revisão de " +
-        etapa +
-        " dias disponível";
-
-    elementos.statusRevisaoArtigo
-      .classList.add(
-        "disponivel"
-      );
-
-    elementos.informacaoProximaRevisao
-      .textContent =
-        etapa === 30
-          ? "Conclua a revisão e reinicie o ciclo em 7 dias."
-          : "Este card está disponível para a revisão de " +
-            etapa +
-            " dias.";
-
-    elementos.botaoConcluirRevisao.hidden =
-      false;
-
-    elementos.botaoConcluirRevisao
-      .textContent =
-        etapa === 30
-          ? "↻ Repetir ciclo"
-          : "Concluir revisão de " +
-            etapa +
-            " dias";
-  } else {
-    elementos.statusRevisaoArtigo
-      .textContent =
-        "Próxima revisão: " +
-        formatarData(
-          proximaRevisao
-        );
-
-    elementos.informacaoProximaRevisao
-      .textContent =
-        "Revisão de " +
-        etapa +
-        " dias marcada para " +
-        formatarDataHora(
-          proximaRevisao
-        ) +
-        ".";
-
-    elementos.botaoConcluirRevisao.hidden =
-      true;
-  }
-}
-
-function selecionarArtigo(
-  posicao
-) {
-  if (
-    posicao < 0 ||
-    posicao >=
-      estado.artigosFiltrados.length
-  ) {
-    return;
-  }
-
-  estado.artigoAtual =
-    posicao;
-
-  desenharMenuArtigos();
-  mostrarArtigoAtual();
-
-  if (
-    window.innerWidth <= 880
-  ) {
-    fecharMenuCelular();
-  }
-}
-
-function pesquisarArtigos() {
-  const pesquisa =
-    normalizarTexto(
-      elementos.campoPesquisa.value
-    );
-
-  if (!pesquisa) {
-    estado.artigosFiltrados = [
-      ...estado.artigos
-    ];
-  } else {
-    estado.artigosFiltrados =
-      estado.artigos.filter(
-        function (artigo) {
-          const textoCompleto = [
-            artigo.materia,
-            artigo.assunto,
-            artigo.numero_artigo,
-            artigo.titulo,
-            artigo.texto_lei,
-            artigo.explicacao
-          ].join(" ");
-
-          return normalizarTexto(
-            textoCompleto
-          ).includes(pesquisa);
-        }
-      );
-  }
-
-  estado.artigoAtual = 0;
-
-  desenharMenuArtigos();
-  mostrarArtigoAtual();
-}
-
-function normalizarTexto(
-  texto = ""
-) {
-  return texto
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(
-      /[\u0300-\u036f]/g,
-      ""
-    );
-}
-
-/* =========================================================
-   REGISTRO DE ESTUDO
-   ========================================================= */
-
-async function registrarEstudoArtigoAtual() {
-  const artigo =
-    estado.artigosFiltrados[
-      estado.artigoAtual
-    ];
-
-  if (!artigo) {
-    return;
-  }
-
-  elementos.botaoRegistrarEstudo.disabled =
-    true;
-
-  elementos.botaoRegistrarEstudo.textContent =
-    "Registrando...";
-
-  const { error } =
-    await supabaseCliente.rpc(
-      "registrar_estudo",
-      {
-        p_artigo_id:
-          artigo.id
-      }
-    );
-
-  elementos.botaoRegistrarEstudo.disabled =
-    false;
-
-  elementos.botaoRegistrarEstudo.textContent =
-    "✓ Marcar como estudado";
-
-  if (error) {
-    console.error(
-      "Erro ao registrar estudo:",
-      error
-    );
-
-    mostrarAviso(
-      "Não foi possível registrar o estudo: " +
-      error.message,
-      true
-    );
-
-    return;
-  }
-
-  mostrarAviso(
-    "Card registrado como estudado."
-  );
-
-  await carregarArtigos(
-    artigo.id
-  );
-
-  await carregarDadosAnaliticos();
-}
-
-async function concluirRevisaoArtigoAtual() {
-  const artigo =
-    estado.artigosFiltrados[
-      estado.artigoAtual
-    ];
-
-  if (!artigo) {
-    return;
-  }
-
-  const etapaAnterior =
-    artigo.etapa_revisao;
-
-  elementos.botaoConcluirRevisao.disabled =
-    true;
-
-  elementos.botaoConcluirRevisao.textContent =
-    "Concluindo...";
-
-  const { error } =
-    await supabaseCliente.rpc(
-      "concluir_revisao",
-      {
-        p_artigo_id:
-          artigo.id
-      }
-    );
-
-  elementos.botaoConcluirRevisao.disabled =
-    false;
-
-  if (error) {
-    console.error(
-      "Erro ao concluir revisão:",
-      error
-    );
-
-    mostrarAviso(
-      "Não foi possível concluir a revisão: " +
-      error.message,
-      true
-    );
-
-    mostrarArtigoAtual();
-
-    return;
-  }
-
-  const mensagem =
-    etapaAnterior === 30
-      ? "Ciclo concluído e reiniciado em 7 dias."
-      : "Revisão de " +
-        etapaAnterior +
-        " dias concluída.";
-
-  mostrarAviso(mensagem);
-
-  await carregarArtigos(
-    artigo.id
-  );
-
-  await carregarDadosAnaliticos();
-
-  desenharRevisoes();
-}
-
-/* =========================================================
-   TELA DE REVISÕES
-   ========================================================= */
-
-function artigosDisponiveisParaRevisao() {
-  const agora =
-    new Date();
-
-  return estado.artigos.filter(
-    function (artigo) {
-      return (
-        new Date(
-          artigo.proxima_revisao
-        ) <= agora
-      );
-    }
-  );
-}
-
-function atualizarQuantidadeRevisoes() {
-  const quantidade =
-    artigosDisponiveisParaRevisao()
-      .length;
-
-  elementos.quantidadeRevisoesMenu
-    .textContent =
-      quantidade;
-
-  elementos.quantidadeRevisoesMenu.hidden =
-    quantidade === 0;
-}
-
-function desenharRevisoes() {
-  const disponiveis =
-    artigosDisponiveisParaRevisao();
-
-  const grupos = {
-    7: disponiveis.filter(
-      function (artigo) {
-        return (
-          artigo.etapa_revisao === 7
-        );
-      }
-    ),
-
-    15: disponiveis.filter(
-      function (artigo) {
-        return (
-          artigo.etapa_revisao === 15
-        );
-      }
-    ),
-
-    30: disponiveis.filter(
-      function (artigo) {
-        return (
-          artigo.etapa_revisao === 30
-        );
-      }
-    )
-  };
-
-  elementos.contadorRevisao7
-    .textContent =
-      grupos[7].length;
-
-  elementos.contadorRevisao15
-    .textContent =
-      grupos[15].length;
-
-  elementos.contadorRevisao30
-    .textContent =
-      grupos[30].length;
-
-  elementos.totalBloco7
-    .textContent =
-      textoQuantidadeCards(
-        grupos[7].length
-      );
-
-  elementos.totalBloco15
-    .textContent =
-      textoQuantidadeCards(
-        grupos[15].length
-      );
-
-  elementos.totalBloco30
-    .textContent =
-      textoQuantidadeCards(
-        grupos[30].length
-      );
-
-  desenharListaRevisao(
-    elementos.listaRevisao7,
-    grupos[7]
-  );
-
-  desenharListaRevisao(
-    elementos.listaRevisao15,
-    grupos[15]
-  );
-
-  desenharListaRevisao(
-    elementos.listaRevisao30,
-    grupos[30]
-  );
-
-  atualizarQuantidadeRevisoes();
-}
-
-function desenharListaRevisao(
-  container,
-  artigos
-) {
-  container.replaceChildren();
-
-  if (artigos.length === 0) {
-    const vazio =
-      document.createElement("p");
-
-    vazio.className =
-      "revisao-vazia";
-
-    vazio.textContent =
-      "Nenhum card disponível neste bloco.";
-
-    container.appendChild(vazio);
-
-    return;
-  }
-
-  artigos.forEach(
-    function (artigo) {
-      const card =
-        document.createElement(
-          "article"
-        );
-
-      card.className =
-        "card-revisao";
-
-      const conteudo =
-        document.createElement(
-          "div"
-        );
-
-      const local =
-        document.createElement(
-          "small"
-        );
-
-      local.textContent =
-        artigo.materia +
-        " › " +
-        artigo.assunto;
-
-      const titulo =
-        document.createElement(
-          "h4"
-        );
-
-      titulo.textContent =
-        artigo.numero_artigo +
-        " - " +
-        artigo.titulo;
-
-      const data =
-        document.createElement(
-          "p"
-        );
-
-      data.textContent =
-        "Disponível desde " +
-        formatarDataHora(
-          artigo.proxima_revisao
-        );
-
-      conteudo.append(
-        local,
-        titulo,
-        data
-      );
-
-      const acoes =
-        document.createElement(
-          "div"
-        );
-
-      acoes.className =
-        "card-revisao-acoes";
-
-      const botao =
-        document.createElement(
-          "button"
-        );
-
-      botao.type =
-        "button";
-
-      botao.className =
-        "botao-principal";
-
-      botao.textContent =
-        artigo.etapa_revisao === 30
-          ? "Revisar e repetir ciclo"
-          : "Revisar agora";
-
-      botao.addEventListener(
-        "click",
-        function () {
-          abrirArtigoPelaId(
-            artigo.id
-          );
-        }
-      );
-
-      acoes.appendChild(botao);
-
-      card.append(
-        conteudo,
-        acoes
-      );
-
-      container.appendChild(card);
-    }
-  );
-}
-
-function abrirArtigoPelaId(
-  idArtigo
-) {
-  estado.artigosFiltrados = [
-    ...estado.artigos
-  ];
-
-  const posicao =
-    estado.artigosFiltrados
-      .findIndex(
-        function (artigo) {
-          return (
-            artigo.id ===
-            idArtigo
-          );
-        }
-      );
-
-  estado.artigoAtual =
-    posicao >= 0
-      ? posicao
-      : 0;
-
-  elementos.campoPesquisa.value =
-    "";
-
-  trocarTela("lei-seca");
-
-  desenharMenuArtigos();
-  mostrarArtigoAtual();
-}
-
-function textoQuantidadeCards(
-  quantidade
-) {
-  return quantidade === 1
-    ? "1 card"
-    : quantidade + " cards";
-}
-
-/* =========================================================
-   DADOS DOS INSIGHTS
-   ========================================================= */
-
-async function carregarDadosAnaliticos() {
-  const [
-    resultadoHistorico,
-    resultadoSessoes
-  ] = await Promise.all([
-    supabaseCliente
-      .from("historico_estudos")
-      .select("*")
-      .order(
-        "estudado_em",
-        { ascending: false }
       ),
 
     supabaseCliente
-      .from("sessoes_estudo")
+      .from("assuntos")
       .select("*")
       .order(
-        "iniciado_em",
-        { ascending: false }
+        "ordem",
+        { ascending: true }
+      )
+      .order(
+        "nome",
+        { ascending: true }
+      ),
+
+    supabaseCliente
+      .from("topicos")
+      .select("*")
+      .order(
+        "ordem",
+        { ascending: true }
+      )
+      .order(
+        "nome",
+        { ascending: true }
       )
   ]);
 
-  if (resultadoHistorico.error) {
+  if (resultadoMaterias.error) {
     console.error(
-      "Erro ao carregar histórico:",
-      resultadoHistorico.error
+      "Erro ao carregar matérias:",
+      resultadoMaterias.error
     );
 
-    estado.historico = [];
+    estado.materias = [];
   } else {
-    estado.historico =
-      resultadoHistorico.data || [];
+    estado.materias =
+      resultadoMaterias.data || [];
   }
 
-  if (resultadoSessoes.error) {
+  if (resultadoAssuntos.error) {
     console.error(
-      "Erro ao carregar sessões:",
-      resultadoSessoes.error
+      "Erro ao carregar assuntos:",
+      resultadoAssuntos.error
     );
 
-    estado.sessoes = [];
+    estado.assuntos = [];
   } else {
-    estado.sessoes =
-      resultadoSessoes.data || [];
-  }
-}
-
-function desenharInsights() {
-  const sessoesFinalizadas =
-    estado.sessoes.filter(
-      function (sessao) {
-        return (
-          sessao.id !==
-          estado.sessaoAtualId
-        );
-      }
-    );
-
-  const tempoRegistrado =
-    sessoesFinalizadas.reduce(
-      function (
-        total,
-        sessao
-      ) {
-        return (
-          total +
-          Number(
-            sessao.duracao_segundos ||
-            0
-          )
-        );
-      },
-      0
-    );
-
-  const tempoAtual =
-    estado.cronometroAtivo
-      ? estado.segundosSessao
-      : 0;
-
-  elementos.tempoTotalEstudado
-    .textContent =
-      transformarSegundosEmTexto(
-        tempoRegistrado +
-        tempoAtual
-      );
-
-  elementos.totalCardsCriados
-    .textContent =
-      estado.artigos.length;
-
-  elementos.totalCardsEstudados
-    .textContent =
-      estado.historico.length;
-
-  elementos.totalRevisoesPendentes
-    .textContent =
-      artigosDisponiveisParaRevisao()
-        .length;
-
-  const dias =
-    obterUltimosSeteDias();
-
-  const cardsCriados =
-    contarPorDia(
-      estado.artigos,
-      "criado_em",
-      dias
-    );
-
-  const cardsEstudados =
-    contarPorDia(
-      estado.historico,
-      "estudado_em",
-      dias
-    );
-
-  desenharGrafico(
-    elementos.graficoCardsCriados,
-    dias,
-    cardsCriados,
-    false
-  );
-
-  desenharGrafico(
-    elementos.graficoCardsEstudados,
-    dias,
-    cardsEstudados,
-    true
-  );
-
-  desenharLinhaTempo();
-}
-
-function obterUltimosSeteDias() {
-  const dias = [];
-
-  for (
-    let diferenca = 6;
-    diferenca >= 0;
-    diferenca--
-  ) {
-    const data =
-      new Date();
-
-    data.setHours(
-      0,
-      0,
-      0,
-      0
-    );
-
-    data.setDate(
-      data.getDate() -
-      diferenca
-    );
-
-    dias.push(data);
+    estado.assuntos =
+      resultadoAssuntos.data || [];
   }
 
-  return dias;
-}
-
-function contarPorDia(
-  lista,
-  campoData,
-  dias
-) {
-  const contagem = {};
-
-  dias.forEach(
-    function (dia) {
-      contagem[
-        chaveLocalData(dia)
-      ] = 0;
-    }
-  );
-
-  lista.forEach(
-    function (item) {
-      if (!item[campoData]) {
-        return;
-      }
-
-      const chave =
-        chaveLocalData(
-          new Date(
-            item[campoData]
-          )
-        );
-
-      if (
-        Object.hasOwn(
-          contagem,
-          chave
-        )
-      ) {
-        contagem[chave] += 1;
-      }
-    }
-  );
-
-  return contagem;
-}
-
-function desenharGrafico(
-  container,
-  dias,
-  contagem,
-  estudados
-) {
-  container.replaceChildren();
-
-  container.classList.toggle(
-    "grafico-estudados",
-    estudados
-  );
-
-  const valores =
-    Object.values(contagem);
-
-  const maiorValor =
-    Math.max(
-      1,
-      ...valores
+  if (resultadoTopicos.error) {
+    console.error(
+      "Erro ao carregar tópicos:",
+      resultadoTopicos.error
     );
 
-  dias.forEach(
-    function (dia) {
-      const chave =
-        chaveLocalData(dia);
-
-      const valor =
-        contagem[chave] || 0;
-
-      const coluna =
-        document.createElement(
-          "div"
-        );
-
-      coluna.className =
-        "coluna-grafico";
-
-      const numero =
-        document.createElement(
-          "span"
-        );
-
-      numero.className =
-        "valor-barra";
-
-      numero.textContent =
-        valor;
-
-      const barra =
-        document.createElement(
-          "div"
-        );
-
-      barra.className =
-        "barra-grafico";
-
-      const altura =
-        valor === 0
-          ? 5
-          : Math.max(
-              16,
-              (
-                valor /
-                maiorValor
-              ) * 145
-            );
-
-      barra.style.height =
-        altura + "px";
-
-      const rotulo =
-        document.createElement(
-          "span"
-        );
-
-      rotulo.className =
-        "rotulo-barra";
-
-      rotulo.textContent =
-        dia
-          .toLocaleDateString(
-            "pt-BR",
-            {
-              weekday: "short"
-            }
-          )
-          .replace(".", "");
-
-      coluna.append(
-        numero,
-        barra,
-        rotulo
-      );
-
-      container.appendChild(
-        coluna
-      );
-    }
-  );
-}
-
-/* =========================================================
-   LINHA DO TEMPO
-   ========================================================= */
-
-function desenharLinhaTempo() {
-  elementos.linhaTempoEstudos
-    .replaceChildren();
-
-  const eventos =
-    estado.historico.slice(
-      0,
-      20
-    );
-
-  if (eventos.length === 0) {
-    const vazio =
-      document.createElement("p");
-
-    vazio.className =
-      "linha-tempo-vazia";
-
-    vazio.textContent =
-      "Nenhum estudo registrado até o momento.";
-
-    elementos.linhaTempoEstudos
-      .appendChild(vazio);
-
-    return;
+    estado.topicos = [];
+  } else {
+    estado.topicos =
+      resultadoTopicos.data || [];
   }
 
-  eventos.forEach(
-    function (evento) {
-      const artigo =
-        estado.artigos.find(
-          function (item) {
-            return (
-              item.id ===
-              evento.artigo_id
-            );
-          }
-        );
-
-      const caixa =
-        document.createElement(
-          "article"
-        );
-
-      caixa.className =
-        "evento-linha-tempo";
-
-      if (
-        evento.tipo ===
-        "revisao"
-      ) {
-        caixa.classList.add(
-          "revisao"
-        );
-      }
-
-      const ponto =
-        document.createElement(
-          "span"
-        );
-
-      ponto.className =
-        "ponto-linha-tempo";
-
-      const conteudo =
-        document.createElement(
-          "div"
-        );
-
-      conteudo.className =
-        "conteudo-evento";
-
-      const titulo =
-        document.createElement(
-          "strong"
-        );
-
-      titulo.textContent =
-        evento.tipo === "revisao"
-          ? "Revisão de " +
-            evento.etapa_revisao +
-            " dias concluída"
-          : "Card estudado";
-
-      const descricao =
-        document.createElement(
-          "p"
-        );
-
-      descricao.textContent =
-        artigo
-          ? artigo.numero_artigo +
-            " - " +
-            artigo.titulo
-          : "Card removido ou indisponível";
-
-      const data =
-        document.createElement(
-          "time"
-        );
-
-      data.textContent =
-        formatarDataHora(
-          evento.estudado_em
-        );
-
-      conteudo.append(
-        titulo,
-        descricao,
-        data
-      );
-
-      caixa.append(
-        ponto,
-        conteudo
-      );
-
-      elementos.linhaTempoEstudos
-        .appendChild(caixa);
-    }
-  );
+  preencherSeletoresEstrutura();
+  desenharEstruturaCadastrada();
 }
 
-function chaveLocalData(data) {
-  const ano =
-    data.getFullYear();
-
-  const mes =
-    String(
-      data.getMonth() + 1
-    ).padStart(2, "0");
-
-  const dia =
-    String(
-      data.getDate()
-    ).padStart(2, "0");
-
-  return (
-    ano +
-    "-" +
-    mes +
-    "-" +
-    dia
-  );
-}
-
-/* =========================================================
-   GERENCIAMENTO DE CONTEÚDO
-   ========================================================= */
-
-function abrirGerenciador() {
-  fecharMenuCelular();
-
-  desenharListaGerenciamento();
-
-  elementos.janelaGerenciar
-    .showModal();
-}
-
-function fecharDialogoAoClicarFora(
-  evento
+function preencherSelect(
+  select,
+  itens,
+  textoInicial,
+  valorSelecionado = ""
 ) {
+  select.replaceChildren();
+
+  const opcaoInicial =
+    document.createElement("option");
+
+  opcaoInicial.value = "";
+  opcaoInicial.textContent =
+    textoInicial;
+
+  select.appendChild(opcaoInicial);
+
+  itens.forEach(function (item) {
+    const opcao =
+      document.createElement("option");
+
+    opcao.value = item.id;
+    opcao.textContent = item.nome;
+
+    select.appendChild(opcao);
+  });
+
+  select.disabled =
+    itens.length === 0;
+
   if (
-    evento.target !==
-    elementos.janelaGerenciar
+    valorSelecionado &&
+    itens.some(
+      item =>
+        item.id === valorSelecionado
+    )
   ) {
-    return;
-  }
-
-  const area =
-    elementos.janelaGerenciar
-      .getBoundingClientRect();
-
-  const clicouDentro =
-    evento.clientX >= area.left &&
-    evento.clientX <= area.right &&
-    evento.clientY >= area.top &&
-    evento.clientY <= area.bottom;
-
-  if (!clicouDentro) {
-    elementos.janelaGerenciar
-      .close();
+    select.value = valorSelecionado;
   }
 }
 
-async function salvarArtigo(
-  evento
+function preencherSeletoresEstrutura() {
+  const materiaAssuntoAtual =
+    elementos.selectMateriaAssunto.value;
+
+  const materiaTopicoAtual =
+    elementos.selectMateriaTopico.value;
+
+  const materiaCardAtual =
+    elementos.campoMateria.value;
+
+  const assuntoCardAtual =
+    elementos.campoAssunto.value;
+
+  const topicoCardAtual =
+    elementos.campoTopico.value;
+
+  preencherSelect(
+    elementos.selectMateriaAssunto,
+    estado.materias,
+    "Selecione uma matéria",
+    materiaAssuntoAtual
+  );
+
+  preencherSelect(
+    elementos.selectMateriaTopico,
+    estado.materias,
+    "Selecione uma matéria",
+    materiaTopicoAtual
+  );
+
+  preencherSelect(
+    elementos.campoMateria,
+    estado.materias,
+    "Selecione uma matéria",
+    materiaCardAtual
+  );
+
+  preencherAssuntosDoTopico();
+
+  preencherAssuntosDoCard(
+    assuntoCardAtual,
+    topicoCardAtual
+  );
+}
+
+function preencherAssuntosDoTopico(
+  valorSelecionado = ""
 ) {
+  const materiaId =
+    elementos.selectMateriaTopico.value;
+
+  const assuntos =
+    estado.assuntos.filter(
+      assunto =>
+        assunto.materia_id ===
+        materiaId
+    );
+
+  preencherSelect(
+    elementos.selectAssuntoTopico,
+    assuntos,
+    materiaId
+      ? "Selecione um assunto"
+      : "Primeiro selecione uma matéria",
+    valorSelecionado
+  );
+}
+
+function preencherAssuntosDoCard(
+  valorAssunto = "",
+  valorTopico = ""
+) {
+  const materiaId =
+    elementos.campoMateria.value;
+
+  const assuntos =
+    estado.assuntos.filter(
+      assunto =>
+        assunto.materia_id ===
+        materiaId
+    );
+
+  preencherSelect(
+    elementos.campoAssunto,
+    assuntos,
+    materiaId
+      ? "Selecione um assunto"
+      : "Primeiro selecione uma matéria",
+    valorAssunto
+  );
+
+  preencherTopicosDoCard(
+    valorTopico
+  );
+}
+
+function preencherTopicosDoCard(
+  valorSelecionado = ""
+) {
+  const assuntoId =
+    elementos.campoAssunto.value;
+
+  const topicos =
+    estado.topicos.filter(
+      topico =>
+        topico.assunto_id ===
+        assuntoId
+    );
+
+  preencherSelect(
+    elementos.campoTopico,
+    topicos,
+    assuntoId
+      ? "Selecione um tópico"
+      : "Primeiro selecione um assunto",
+    valorSelecionado
+  );
+}
+
+function trocarAbaGerenciamento(aba) {
+  const mostrarEstrutura =
+    aba === "estrutura";
+
+  elementos.painelEstrutura.hidden =
+    !mostrarEstrutura;
+
+  elementos.painelCards.hidden =
+    mostrarEstrutura;
+
+  elementos.abaEstrutura.classList.toggle(
+    "ativa",
+    mostrarEstrutura
+  );
+
+  elementos.abaCards.classList.toggle(
+    "ativa",
+    !mostrarEstrutura
+  );
+}
+
+async function salvarMateria(evento) {
   evento.preventDefault();
 
-  elementos.botaoSalvarArtigo.disabled =
+  const nome =
+    elementos.campoNomeMateria
+      .value.trim();
+
+  const ordem =
+    Number(
+      elementos.campoOrdemMateria.value
+    ) || 0;
+
+  elementos.botaoSalvarMateria.disabled =
     true;
 
-  elementos.botaoSalvarArtigo.textContent =
-    "Salvando...";
-
-  elementos.mensagemFormulario.textContent =
+  elementos.mensagemMateria.textContent =
     "";
 
-  const dadosArtigo = {
-    materia:
-      elementos.campoMateria
-        .value.trim(),
-
-    assunto:
-      elementos.campoAssunto
-        .value.trim(),
-
-    numero_artigo:
-      elementos.campoNumero
-        .value.trim(),
-
-    titulo:
-      elementos.campoTitulo
-        .value.trim(),
-
-    texto_lei:
-      elementos.campoTextoLei
-        .value.trim(),
-
-    explicacao:
-      elementos.campoExplicacao
-        .value.trim(),
-
-    pena:
-      elementos.campoPena
-        .value.trim(),
-
-    multa:
-      elementos.campoMulta
-        .value.trim(),
-
-    ordem:
-      Number(
-        elementos.campoOrdem.value
-      ) || 0,
-
-    ativo: true
+  const dados = {
+    nome,
+    ordem,
+    atualizado_em:
+      new Date().toISOString()
   };
 
-  try {
-    let idArtigoSalvo =
-      estado.artigoSendoEditado;
-
-    let resultado;
-
-    if (
-      estado.artigoSendoEditado
-    ) {
-      resultado =
-        await supabaseCliente
-          .from("artigos")
-          .update(
-            dadosArtigo
-          )
+  const resultado =
+    estado.materiaSendoEditada
+      ? await supabaseCliente
+          .from("materias")
+          .update(dados)
           .eq(
             "id",
-            estado.artigoSendoEditado
+            estado.materiaSendoEditada
           )
-          .select()
-          .single();
-    } else {
-      resultado =
-        await supabaseCliente
-          .from("artigos")
+      : await supabaseCliente
+          .from("materias")
           .insert({
-            ...dadosArtigo,
+            ...dados,
             usuario_id:
               estado.usuario.id
-          })
-          .select()
-          .single();
-    }
+          });
 
-    if (resultado.error) {
-      throw resultado.error;
-    }
-
-    idArtigoSalvo =
-      resultado.data.id;
-
-    mostrarAviso(
-      estado.artigoSendoEditado
-        ? "Artigo atualizado com sucesso."
-        : "Artigo criado. A primeira revisão será em 7 dias."
-    );
-
-    limparFormulario();
-
-    await carregarArtigos(
-      idArtigoSalvo
-    );
-
-    await carregarDadosAnaliticos();
-  } catch (erro) {
-    console.error(
-      "Erro ao salvar artigo:",
-      erro
-    );
-
-    elementos.mensagemFormulario
-      .textContent =
-        "Não foi possível salvar: " +
-        erro.message;
-  } finally {
-    elementos.botaoSalvarArtigo.disabled =
-      false;
-
-    elementos.botaoSalvarArtigo.textContent =
-      estado.artigoSendoEditado
-        ? "Atualizar artigo"
-        : "Salvar artigo";
-  }
-}
-
-function editarArtigo(id) {
-  const artigo =
-    estado.artigos.find(
-      function (item) {
-        return item.id === id;
-      }
-    );
-
-  if (!artigo) {
-    return;
-  }
-
-  estado.artigoSendoEditado =
-    id;
-
-  elementos.idArtigo.value =
-    id;
-
-  elementos.campoMateria.value =
-    artigo.materia;
-
-  elementos.campoAssunto.value =
-    artigo.assunto;
-
-  elementos.campoNumero.value =
-    artigo.numero_artigo;
-
-  elementos.campoTitulo.value =
-    artigo.titulo;
-
-  elementos.campoTextoLei.value =
-    artigo.texto_lei;
-
-  elementos.campoExplicacao.value =
-    artigo.explicacao || "";
-
-  elementos.campoPena.value =
-    artigo.pena || "";
-
-  elementos.campoMulta.value =
-    artigo.multa || "";
-
-  elementos.campoOrdem.value =
-    artigo.ordem || 0;
-
-  elementos.tituloFormulario.textContent =
-    "Editar artigo";
-
-  elementos.botaoSalvarArtigo.textContent =
-    "Atualizar artigo";
-
-  elementos.botaoCancelarEdicao.hidden =
+  elementos.botaoSalvarMateria.disabled =
     false;
 
-  elementos.campoMateria.focus();
-}
-
-async function excluirArtigo(id) {
-  const artigo =
-    estado.artigos.find(
-      function (item) {
-        return item.id === id;
-      }
-    );
-
-  if (!artigo) {
-    return;
-  }
-
-  const confirmou =
-    window.confirm(
-      "Excluir “" +
-      artigo.numero_artigo +
-      " - " +
-      artigo.titulo +
-      "”?"
-    );
-
-  if (!confirmou) {
-    return;
-  }
-
-  const { error } =
-    await supabaseCliente
-      .from("artigos")
-      .delete()
-      .eq("id", id);
-
-  if (error) {
-    mostrarAviso(
-      "Não foi possível excluir: " +
-      error.message,
-      true
-    );
+  if (resultado.error) {
+    elementos.mensagemMateria.textContent =
+      resultado.error.code === "23505"
+        ? "Essa matéria já está cadastrada."
+        : "Não foi possível salvar: " +
+          resultado.error.message;
 
     return;
-  }
-
-  if (
-    estado.artigoSendoEditado === id
-  ) {
-    limparFormulario();
   }
 
   mostrarAviso(
-    "Artigo excluído."
+    estado.materiaSendoEditada
+      ? "Matéria atualizada."
+      : "Matéria criada."
   );
 
+  limparFormularioMateria();
+
+  await carregarEstrutura();
   await carregarArtigos();
-  await carregarDadosAnaliticos();
 }
 
-function desenharListaGerenciamento() {
-  elementos.listaArtigosSalvos
-    .replaceChildren();
+async function salvarAssunto(evento) {
+  evento.preventDefault();
 
-  elementos.quantidadeSalva.textContent =
-    estado.artigos.length;
+  const materiaId =
+    elementos.selectMateriaAssunto.value;
 
-  if (
-    estado.artigos.length === 0
-  ) {
-    const vazio =
-      document.createElement("p");
+  const nome =
+    elementos.campoNomeAssunto
+      .value.trim();
 
-    vazio.className =
-      "lista-vazia";
+  const ordem =
+    Number(
+      elementos.campoOrdemAssunto.value
+    ) || 0;
 
-    vazio.textContent =
-      "Nenhum artigo cadastrado.";
-
-    elementos.listaArtigosSalvos
-      .appendChild(vazio);
-
-    return;
-  }
-
-  estado.artigos.forEach(
-    function (artigo) {
-      const caixa =
-        document.createElement(
-          "article"
-        );
-
-      caixa.className =
-        "artigo-salvo";
-
-      const local =
-        document.createElement(
-          "small"
-        );
-
-      local.textContent =
-        artigo.materia +
-        " › " +
-        artigo.assunto;
-
-      const titulo =
-        document.createElement(
-          "strong"
-        );
-
-      titulo.textContent =
-        artigo.numero_artigo +
-        " - " +
-        artigo.titulo;
-
-      const data =
-        document.createElement(
-          "span"
-        );
-
-      data.className =
-        "data-criacao";
-
-      data.textContent =
-        "Criado em " +
-        formatarDataHora(
-          artigo.criado_em
-        );
-
-      const acoes =
-        document.createElement(
-          "div"
-        );
-
-      acoes.className =
-        "acoes-artigo";
-
-      const botaoEditar =
-        document.createElement(
-          "button"
-        );
-
-      botaoEditar.type =
-        "button";
-
-      botaoEditar.textContent =
-        "Editar";
-
-      botaoEditar.addEventListener(
-        "click",
-        function () {
-          editarArtigo(
-            artigo.id
-          );
-        }
-      );
-
-      const botaoExcluir =
-        document.createElement(
-          "button"
-        );
-
-      botaoExcluir.type =
-        "button";
-
-      botaoExcluir.className =
-        "excluir";
-
-      botaoExcluir.textContent =
-        "Excluir";
-
-      botaoExcluir.addEventListener(
-        "click",
-        function () {
-          excluirArtigo(
-            artigo.id
-          );
-        }
-      );
-
-      acoes.append(
-        botaoEditar,
-        botaoExcluir
-      );
-
-      caixa.append(
-        local,
-        titulo,
-        data,
-        acoes
-      );
-
-      elementos.listaArtigosSalvos
-        .appendChild(caixa);
-    }
-  );
-}
-
-function limparFormulario() {
-  estado.artigoSendoEditado =
-    null;
-
-  elementos.formularioArtigo
-    .reset();
-
-  elementos.idArtigo.value =
-    "";
-
-  elementos.campoOrdem.value =
-    0;
-
-  elementos.tituloFormulario.textContent =
-    "Novo artigo";
-
-  elementos.botaoSalvarArtigo.textContent =
-    "Salvar artigo";
-
-  elementos.botaoCancelarEdicao.hidden =
+  elementos.botaoSalvarAssunto.disabled =
     true;
 
-  elementos.mensagemFormulario.textContent =
+  elementos.mensagemAssunto.textContent =
     "";
-}
 
-/* =========================================================
-   DATAS
-   ========================================================= */
+  const dados = {
+    materia_id: materiaId,
+    nome,
+    ordem,
+    atualizado_em:
+      new Date().toISOString()
+  };
 
-function formatarData(data) {
-  if (!data) {
-    return "Não definida";
-  }
-
-  return new Date(
-    data
-  ).toLocaleDateString(
-    "pt-BR"
-  );
-}
-
-function formatarDataHora(data) {
-  if (!data) {
-    return "Não definida";
-  }
-
-  return new Date(
-    data
-  ).toLocaleString(
-    "pt-BR",
-    {
-      dateStyle: "short",
-      timeStyle: "short"
-    }
-  );
-}
-
-/* =========================================================
-   AVISOS
-   ========================================================= */
-
-let tempoAviso;
-
-function mostrarAviso(
-  mensagem,
-  mensagemDeErro = false
-) {
-  clearTimeout(
-    tempoAviso
-  );
-
-  elementos.aviso.textContent =
-    mensagem;
-
-  elementos.aviso.className =
-    mensagemDeErro
-      ? "aviso mostrar erro"
-      : "aviso mostrar";
-
-  tempoAviso =
-    setTimeout(
-      function () {
-        elementos.aviso
-          .classList.remove(
-            "mostrar"
-          );
-      },
-      4000
-    );
-}
+  const resultado =
+    estado.assuntoSendoEditado
+      ? await supabaseCliente
+          .from("assuntos")
+          .update(dados)
+          .eq(
+            "id",
+            estado.assuntoSendoEditado
+          )
+      : await supabaseCliente
+         
