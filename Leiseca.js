@@ -72,6 +72,7 @@ const idsElementos = [
   "emailUsuario",
   "letraUsuario",
   "botaoNovoEstudo",
+  "botaoPararEstudo"
   "cronometro",
   "controleCronometro",
   "textoSituacao",
@@ -165,11 +166,16 @@ async function iniciarSistema() {
   atualizarQuantidadeRevisoes();
   desenharTudo();
 
-  if (elementos.controleCronometro.checked) {
-    await iniciarCronometro();
-  } else {
-    atualizarSituacaoCronometro(false);
-  }
+  /*
+  Ao abrir a página, o estudo começa parado.
+  O tempo somente começa quando a chave for ligada.
+*/
+
+elementos.controleCronometro.checked = false;
+estado.segundosSessao = 0;
+
+atualizarTextoCronometro();
+atualizarSituacaoCronometro(false);
 }
 
 function guardarElementos() {
