@@ -150,6 +150,12 @@ const idsElementos = [
   "campoTitulo",
   "campoTextoLei",
   "campoExplicacao",
+  "janelaEditorAmpliado",
+  "tituloEditorAmpliado",
+  "editorAmpliado",
+  "botaoFecharEditorAmpliado",
+  "botaoCancelarEditorAmpliado",
+  "botaoSalvarEditorAmpliado",
   "campoPena",
   "campoMulta",
   "campoOrdem",
@@ -170,7 +176,11 @@ document.addEventListener(
 async function iniciarSistema() {
   guardarElementos();
   configurarEventos();
+  configurarEditoresRicos();
   restaurarEstadoMenu();
+
+  const { data, error } =
+    await supabaseCliente.auth.getSession();
 
   const { data, error } =
     await supabaseCliente.auth.getSession();
