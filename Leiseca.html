@@ -1327,16 +1327,125 @@
             </label>
           </div>
 
-          <label>
-            Texto da lei
+          <!-- Editor do texto da lei -->
+<div class="campo-editor-formulario">
 
-            <textarea
-              id="campoTextoLei"
-              rows="5"
-              placeholder="Digite o texto do artigo..."
-              required
-            ></textarea>
-          </label>
+  <label for="campoTextoLei">
+    Texto da lei
+  </label>
+
+  <div class="editor-rico">
+
+    <div
+      class="barra-editor"
+      aria-label="Ferramentas do texto da lei"
+    >
+
+      <button
+        class="botao-editor"
+        type="button"
+        data-comando-editor="negrito"
+        data-editor="campoTextoLei"
+        title="Negrito — Ctrl+B"
+        aria-label="Aplicar negrito"
+      >
+        <strong>B</strong>
+      </button>
+
+      <button
+        class="botao-editor botao-marca-texto"
+        type="button"
+        data-comando-editor="destaque"
+        data-editor="campoTextoLei"
+        title="Destacar texto"
+        aria-label="Destacar texto"
+      >
+        <span>ab</span>
+      </button>
+
+      <button
+        class="botao-editor botao-ampliar-editor"
+        type="button"
+        data-expandir-editor="campoTextoLei"
+        data-titulo-editor="Texto da lei"
+        title="Ampliar editor"
+      >
+        ⛶ Ampliar
+      </button>
+    </div>
+
+    <div
+      id="campoTextoLei"
+      class="editor-conteudo"
+      contenteditable="true"
+      role="textbox"
+      aria-multiline="true"
+      aria-label="Texto da lei"
+      data-placeholder="Digite o texto do artigo..."
+      spellcheck="true"
+    ></div>
+  </div>
+</div>
+
+<!-- Editor da explicação -->
+<div class="campo-editor-formulario">
+
+  <label for="campoExplicacao">
+    Explicação ou observação
+  </label>
+
+  <div class="editor-rico">
+
+    <div
+      class="barra-editor"
+      aria-label="Ferramentas da explicação"
+    >
+
+      <button
+        class="botao-editor"
+        type="button"
+        data-comando-editor="negrito"
+        data-editor="campoExplicacao"
+        title="Negrito — Ctrl+B"
+        aria-label="Aplicar negrito"
+      >
+        <strong>B</strong>
+      </button>
+
+      <button
+        class="botao-editor botao-marca-texto"
+        type="button"
+        data-comando-editor="destaque"
+        data-editor="campoExplicacao"
+        title="Destacar texto"
+        aria-label="Destacar texto"
+      >
+        <span>ab</span>
+      </button>
+
+      <button
+        class="botao-editor botao-ampliar-editor"
+        type="button"
+        data-expandir-editor="campoExplicacao"
+        data-titulo-editor="Explicação ou observação"
+        title="Ampliar editor"
+      >
+        ⛶ Ampliar
+      </button>
+    </div>
+
+    <div
+      id="campoExplicacao"
+      class="editor-conteudo editor-explicacao"
+      contenteditable="true"
+      role="textbox"
+      aria-multiline="true"
+      aria-label="Explicação ou observação"
+      data-placeholder="Digite sua explicação..."
+      spellcheck="true"
+    ></div>
+  </div>
+</div>
 
           <label>
             Explicação ou observação
@@ -1441,6 +1550,100 @@
   </section>
 </dialog>
 
+  <!-- ===================================================
+     EDITOR DE TEXTO AMPLIADO
+     =================================================== -->
+
+<dialog
+  id="janelaEditorAmpliado"
+  class="janela-editor-ampliado"
+>
+  <section class="conteudo-editor-ampliado">
+
+    <header class="cabecalho-editor-ampliado">
+
+      <div>
+        <small>EDITOR DE CONTEÚDO</small>
+
+        <h2 id="tituloEditorAmpliado">
+          Editar texto
+        </h2>
+      </div>
+
+      <button
+        id="botaoFecharEditorAmpliado"
+        class="botao-fechar"
+        type="button"
+        aria-label="Fechar editor ampliado"
+        title="Fechar"
+      >
+        ×
+      </button>
+    </header>
+
+    <div class="corpo-editor-ampliado">
+
+      <div class="barra-editor barra-editor-ampliado">
+
+        <button
+          class="botao-editor"
+          type="button"
+          data-comando-editor="negrito"
+          data-editor="editorAmpliado"
+          title="Negrito — Ctrl+B"
+          aria-label="Aplicar negrito"
+        >
+          <strong>B</strong>
+        </button>
+
+        <button
+          class="botao-editor botao-marca-texto"
+          type="button"
+          data-comando-editor="destaque"
+          data-editor="editorAmpliado"
+          title="Destacar texto"
+          aria-label="Destacar texto"
+        >
+          <span>ab</span>
+        </button>
+
+        <span class="atalho-editor">
+          Selecione o texto e use Ctrl+B para negrito
+        </span>
+      </div>
+
+      <div
+        id="editorAmpliado"
+        class="editor-conteudo editor-conteudo-ampliado"
+        contenteditable="true"
+        role="textbox"
+        aria-multiline="true"
+        aria-label="Editor de texto ampliado"
+        spellcheck="true"
+      ></div>
+    </div>
+
+    <footer class="rodape-editor-ampliado">
+
+      <button
+        id="botaoCancelarEditorAmpliado"
+        class="botao-secundario"
+        type="button"
+      >
+        Cancelar
+      </button>
+
+      <button
+        id="botaoSalvarEditorAmpliado"
+        class="botao-principal"
+        type="button"
+      >
+        Aplicar alterações
+      </button>
+    </footer>
+  </section>
+</dialog>
+  
   <!-- Mensagem apresentada no canto da tela -->
 
   <div
