@@ -2862,3 +2862,323 @@ input[type="checkbox"] {
   color: #64748b;
   font-size: 12px;
 }
+
+/* =========================================================
+   EDITOR RICO DE TEXTO
+   ========================================================= */
+
+.campo-editor-formulario {
+  margin-bottom: 16px;
+}
+
+.campo-editor-formulario > label {
+  display: block;
+  margin-bottom: 7px;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.editor-rico {
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 11px;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.editor-rico:focus-within {
+  border-color: #f97316;
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.12);
+}
+
+/* Barra com os botões B, marca-texto e ampliar */
+
+.barra-editor {
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.botao-editor {
+  min-width: 34px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 9px;
+  color: #334155;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 7px;
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.botao-editor:hover {
+  color: #ea580c;
+  background: #fff7ed;
+  border-color: #fb923c;
+}
+
+.botao-editor:focus-visible {
+  outline: 3px solid rgba(249, 115, 22, 0.22);
+  outline-offset: 1px;
+}
+
+.botao-marca-texto span {
+  padding: 1px 3px;
+  color: #713f12;
+  background: #fde047;
+  border-radius: 2px;
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-color: #eab308;
+  text-decoration-thickness: 2px;
+}
+
+.botao-ampliar-editor {
+  min-width: auto;
+  margin-left: auto;
+  padding-right: 11px;
+  padding-left: 11px;
+}
+
+/* Área onde o texto será digitado */
+
+.editor-conteudo {
+  width: 100%;
+  min-height: 145px;
+  max-height: 310px;
+  overflow: auto;
+  padding: 13px 14px;
+  color: #0f172a;
+  background: #ffffff;
+  border: 0;
+  outline: none;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  resize: vertical;
+}
+
+.editor-conteudo.editor-explicacao {
+  min-height: 105px;
+}
+
+/* Placeholder do contenteditable */
+
+.editor-conteudo:empty::before {
+  color: #94a3b8;
+  content: attr(data-placeholder);
+  pointer-events: none;
+}
+
+/* Formatações dentro do editor */
+
+.editor-conteudo strong,
+.editor-conteudo b {
+  color: inherit;
+  font-weight: 700;
+}
+
+.editor-conteudo mark {
+  padding: 1px 2px;
+  color: inherit;
+  background: #fef08a;
+  border-radius: 2px;
+}
+
+/* Formatações exibidas no card */
+
+.texto-lei strong,
+.texto-lei b,
+#textoExplicacao strong,
+#textoExplicacao b {
+  font-weight: 700;
+}
+
+.texto-lei mark,
+#textoExplicacao mark {
+  padding: 1px 3px;
+  color: inherit;
+  background: #fef08a;
+  border-radius: 3px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+/* Preserva as quebras de linha dos textos antigos */
+
+.texto-lei,
+#textoExplicacao {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* =========================================================
+   JANELA DO EDITOR AMPLIADO
+   ========================================================= */
+
+.janela-editor-ampliado {
+  width: min(1000px, calc(100vw - 40px));
+  height: min(760px, calc(100vh - 40px));
+  max-width: none;
+  max-height: none;
+  margin: auto;
+  padding: 0;
+  overflow: hidden;
+  background: #ffffff;
+  border: 0;
+  border-radius: 18px;
+  box-shadow: 0 25px 80px rgba(15, 23, 42, 0.3);
+}
+
+.janela-editor-ampliado::backdrop {
+  background: rgba(15, 23, 42, 0.72);
+  backdrop-filter: blur(3px);
+}
+
+.conteudo-editor-ampliado {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Cabeçalho da janela ampliada */
+
+.cabecalho-editor-ampliado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 18px 22px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.cabecalho-editor-ampliado small {
+  display: block;
+  margin-bottom: 3px;
+  color: #f97316;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.cabecalho-editor-ampliado h2 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 21px;
+}
+
+.cabecalho-editor-ampliado .botao-fechar {
+  flex: 0 0 auto;
+}
+
+/* Corpo da janela ampliada */
+
+.corpo-editor-ampliado {
+  min-height: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 22px;
+  background: #f8fafc;
+}
+
+.barra-editor-ampliado {
+  flex: 0 0 auto;
+  border: 1px solid #cbd5e1;
+  border-bottom: 0;
+  border-radius: 11px 11px 0 0;
+}
+
+.atalho-editor {
+  margin-left: auto;
+  padding-right: 5px;
+  color: #64748b;
+  font-size: 11px;
+}
+
+.editor-conteudo-ampliado {
+  min-height: 0;
+  max-height: none;
+  flex: 1;
+  padding: 22px;
+  overflow-y: auto;
+  border: 1px solid #cbd5e1;
+  border-radius: 0 0 11px 11px;
+  font-size: 16px;
+  line-height: 1.75;
+  resize: none;
+}
+
+.editor-conteudo-ampliado:focus {
+  border-color: #f97316;
+  box-shadow: inset 0 0 0 1px #f97316;
+}
+
+/* Rodapé da janela ampliada */
+
+.rodape-editor-ampliado {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 15px 22px;
+  background: #ffffff;
+  border-top: 1px solid #e2e8f0;
+}
+
+/* =========================================================
+   CELULAR
+   ========================================================= */
+
+@media (max-width: 650px) {
+  .janela-editor-ampliado {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    border-radius: 0;
+  }
+
+  .cabecalho-editor-ampliado {
+    padding: 15px;
+  }
+
+  .corpo-editor-ampliado {
+    padding: 12px;
+  }
+
+  .rodape-editor-ampliado {
+    padding: 12px 15px;
+  }
+
+  .atalho-editor {
+    display: none;
+  }
+
+  .editor-conteudo-ampliado {
+    padding: 16px;
+    font-size: 15px;
+  }
+
+  .botao-ampliar-editor {
+    font-size: 12px;
+  }
+}
