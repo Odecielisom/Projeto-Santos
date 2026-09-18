@@ -876,6 +876,42 @@ function extrairTextoDoConteudo(
 }
 
 /* FIM DA PARTE 1 */
+async function abrirDestinoRecebidoPelaUrl() {
+  const destino =
+    window.location.hash
+      .replace("#", "")
+      .toLowerCase();
+
+  if (destino === "revisoes") {
+    await trocarTela(
+      "revisoes"
+    );
+
+    return;
+  }
+
+  if (destino === "insights") {
+    await trocarTela(
+      "insights"
+    );
+
+    return;
+  }
+
+  if (destino === "gerenciar") {
+    abrirGerenciador(
+      "estrutura"
+    );
+
+    return;
+  }
+
+  if (destino === "lei-seca") {
+    await trocarTela(
+      "lei-seca"
+    );
+  }
+}
 
 async function trocarTela(tela) {
   estado.telaAtual = tela;
