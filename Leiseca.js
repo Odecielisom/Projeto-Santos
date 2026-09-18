@@ -201,7 +201,9 @@ async function iniciarSistema() {
   estado.segundosSessao = 0;
 
   atualizarTextoCronometro();
-  atualizarSituacaoCronometro(false);
+atualizarSituacaoCronometro(false);
+
+await abrirDestinoRecebidoPelaUrl();
 }
 
 function guardarElementos() {
