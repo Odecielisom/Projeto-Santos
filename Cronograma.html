@@ -1,1 +1,898 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
 
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <meta
+    name="description"
+    content="Cronograma de estudos do Projeto Santos"
+  >
+
+  <title>Cronograma | Projeto Santos</title>
+
+  <link
+    rel="stylesheet"
+    href="Cronograma.css"
+  >
+
+  <script
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+  ></script>
+
+  <script
+    src="Cronograma.js"
+    defer
+  ></script>
+</head>
+
+<body>
+
+  <div
+    id="fundoMenuCronograma"
+    class="fundo-menu"
+  ></div>
+
+  <!-- ===================================================
+       MENU LATERAL
+       =================================================== -->
+
+  <aside
+    id="menuCronograma"
+    class="menu-principal"
+  >
+
+    <div class="cabecalho-menu">
+
+      <a
+        class="logo"
+        href="Cronograma.html"
+        aria-label="Projeto Santos"
+      >
+        <span class="simbolo-logo">
+          ⚡
+        </span>
+
+        <span>
+          Projeto Santos
+        </span>
+      </a>
+
+      <button
+        id="botaoRecolherCronograma"
+        class="botao-recolher"
+        type="button"
+        title="Recolher menu"
+        aria-label="Recolher menu"
+      >
+        ‹
+      </button>
+    </div>
+
+    <nav
+      class="navegacao-principal"
+      aria-label="Navegação principal"
+    >
+
+      <p class="titulo-menu">
+        ESTUDOS
+      </p>
+
+      <a
+        class="item-menu ativo"
+        href="Cronograma.html"
+        title="Cronograma"
+      >
+        <span class="icone-menu">
+          ▦
+        </span>
+
+        <span class="texto-menu">
+          Cronograma
+        </span>
+      </a>
+
+      <a
+        class="item-menu"
+        href="Leiseca.html"
+        title="Lei Seca"
+      >
+        <span class="icone-menu">
+          ▤
+        </span>
+
+        <span class="texto-menu">
+          Lei Seca
+        </span>
+      </a>
+
+      <a
+        class="item-menu"
+        href="Leiseca.html#revisoes"
+        title="Revisões"
+      >
+        <span class="icone-menu">
+          ↻
+        </span>
+
+        <span class="texto-menu">
+          Revisões
+        </span>
+      </a>
+
+      <a
+        class="item-menu"
+        href="Leiseca.html#insights"
+        title="Insights"
+      >
+        <span class="icone-menu">
+          ▥
+        </span>
+
+        <span class="texto-menu">
+          Insights
+        </span>
+      </a>
+
+      <p class="titulo-menu">
+        ADMINISTRAÇÃO
+      </p>
+
+      <a
+        class="item-menu"
+        href="Leiseca.html#gerenciar"
+        title="Gerenciar conteúdo"
+      >
+        <span class="icone-menu">
+          ⚙
+        </span>
+
+        <span class="texto-menu">
+          Gerenciar conteúdo
+        </span>
+      </a>
+    </nav>
+
+    <div class="usuario">
+
+      <div
+        id="letraUsuarioCronograma"
+        class="foto-usuario"
+      >
+        U
+      </div>
+
+      <div class="dados-usuario">
+
+        <strong id="nomeUsuarioCronograma">
+          Usuário
+        </strong>
+
+        <small id="emailUsuarioCronograma">
+          Carregando...
+        </small>
+      </div>
+
+      <button
+        id="botaoSairCronograma"
+        class="botao-sair"
+        type="button"
+        title="Sair"
+        aria-label="Sair"
+      >
+        ↪
+      </button>
+    </div>
+  </aside>
+
+  <!-- ===================================================
+       ÁREA PRINCIPAL
+       =================================================== -->
+
+  <div
+    id="areaCronograma"
+    class="area-aplicacao"
+  >
+
+    <header class="cabecalho">
+
+      <div class="grupo-titulo">
+
+        <button
+          id="botaoAbrirMenuCronograma"
+          class="botao-menu-celular"
+          type="button"
+          aria-label="Abrir menu"
+        >
+          ☰
+        </button>
+
+        <div>
+          <h1>
+            Cronograma
+          </h1>
+
+          <span class="etiqueta-projeto">
+            ● Projeto Santos
+          </span>
+        </div>
+      </div>
+
+      <label class="seletor-projeto-topo">
+
+        <span>
+          Projeto atual
+        </span>
+
+        <select
+          id="selectProjetoTopo"
+          aria-label="Selecionar projeto"
+        ></select>
+      </label>
+    </header>
+
+    <main class="conteudo-principal">
+
+      <!-- Abas superiores -->
+      <nav
+        class="abas-cronograma"
+        aria-label="Áreas do cronograma"
+      >
+
+        <button
+          id="abaDashboardCronograma"
+          class="aba-cronograma ativa"
+          type="button"
+        >
+          <span>▥</span>
+          Dashboard
+        </button>
+
+        <button
+          id="abaGerenciamentoCronograma"
+          class="aba-cronograma"
+          type="button"
+        >
+          <span>⚙</span>
+          Gerenciamento
+        </button>
+      </nav>
+
+      <!-- =================================================
+           DASHBOARD
+           ================================================= -->
+
+      <section
+        id="painelDashboardCronograma"
+        class="painel-cronograma"
+      >
+
+        <!-- Aparece enquanto não existir projeto -->
+        <div
+          id="dashboardSemProjeto"
+          class="estado-vazio"
+        >
+
+          <span class="icone-vazio">
+            ▦
+          </span>
+
+          <h2>
+            Crie seu primeiro projeto
+          </h2>
+
+          <p>
+            Monte um edital verticalizado para visualizar
+            o planejamento e registrar seu tempo de estudo.
+          </p>
+
+          <button
+            id="botaoCriarPrimeiroProjeto"
+            class="botao-principal"
+            type="button"
+          >
+            ＋ Criar projeto
+          </button>
+        </div>
+
+        <!-- Aparece quando existe projeto -->
+        <div
+          id="dashboardComProjeto"
+          hidden
+        >
+
+          <div class="cabecalho-painel">
+
+            <div>
+              <p class="titulo-pequeno">
+                VISÃO GERAL
+              </p>
+
+              <h2 id="tituloProjetoDashboard">
+                Seu projeto
+              </h2>
+
+              <p id="detalhesProjetoDashboard">
+                Acompanhe o seu avanço no edital.
+              </p>
+            </div>
+
+            <span
+              id="diasAteProva"
+              class="dias-prova"
+              hidden
+            ></span>
+          </div>
+
+          <!-- Indicadores -->
+          <div class="grade-indicadores">
+
+            <article class="indicador">
+
+              <span class="icone-indicador laranja">
+                ◷
+              </span>
+
+              <div>
+                <small>
+                  Tempo total estudado
+                </small>
+
+                <strong id="tempoTotalProjeto">
+                  00h 00min
+                </strong>
+              </div>
+            </article>
+
+            <article class="indicador">
+
+              <span class="icone-indicador azul">
+                ⌁
+              </span>
+
+              <div>
+                <small>
+                  Tempo estudado hoje
+                </small>
+
+                <strong id="tempoHojeProjeto">
+                  00h 00min
+                </strong>
+              </div>
+            </article>
+
+            <article class="indicador">
+
+              <span class="icone-indicador verde">
+                ✓
+              </span>
+
+              <div>
+                <small>
+                  Edital concluído
+                </small>
+
+                <strong id="percentualEdital">
+                  0%
+                </strong>
+              </div>
+            </article>
+
+            <article class="indicador">
+
+              <span class="icone-indicador roxo">
+                ▤
+              </span>
+
+              <div>
+                <small>
+                  Itens concluídos
+                </small>
+
+                <strong id="itensConcluidos">
+                  0 de 0
+                </strong>
+              </div>
+            </article>
+          </div>
+
+          <div class="grade-dashboard">
+
+            <!-- Cronômetro -->
+            <section class="cartao cronometro-card">
+
+              <div class="titulo-cartao">
+
+                <div>
+                  <p class="titulo-pequeno">
+                    SESSÃO DE ESTUDO
+                  </p>
+
+                  <h3>
+                    Registrar tempo
+                  </h3>
+                </div>
+
+                <span
+                  id="situacaoCronometroProjeto"
+                  class="status-parado"
+                >
+                  Parado
+                </span>
+              </div>
+
+              <label class="campo-formulario">
+
+                Matéria estudada
+
+                <select
+                  id="selectMateriaCronometro"
+                ></select>
+              </label>
+
+              <div
+                id="cronometroProjeto"
+                class="cronometro-grande"
+              >
+                00:00:00
+              </div>
+
+              <div class="acoes-cronometro">
+
+                <button
+                  id="botaoIniciarCronometroProjeto"
+                  class="botao-principal"
+                  type="button"
+                >
+                  ▶ Iniciar estudo
+                </button>
+
+                <button
+                  id="botaoPararCronometroProjeto"
+                  class="botao-parar"
+                  type="button"
+                  title="Parar e contabilizar"
+                  aria-label="Parar e contabilizar"
+                  disabled
+                >
+                  ■
+                </button>
+              </div>
+
+              <p class="ajuda-cronometro">
+                O tempo só começa quando você clicar
+                em “Iniciar estudo”.
+              </p>
+            </section>
+
+            <!-- Plano do dia -->
+            <section class="cartao plano-hoje-card">
+
+              <div class="titulo-cartao">
+
+                <div>
+                  <p class="titulo-pequeno">
+                    PLANO DO DIA
+                  </p>
+
+                  <h3>
+                    Matérias para estudar hoje
+                  </h3>
+                </div>
+
+                <span id="dataPlanoHoje"></span>
+              </div>
+
+              <div
+                id="listaPlanoHoje"
+                class="lista-plano-hoje"
+              ></div>
+            </section>
+          </div>
+
+          <div class="grade-dashboard inferior">
+
+            <!-- Progresso -->
+            <section class="cartao">
+
+              <div class="titulo-cartao">
+
+                <div>
+                  <p class="titulo-pequeno">
+                    EDITAL VERTICALIZADO
+                  </p>
+
+                  <h3>
+                    Progresso por matéria
+                  </h3>
+                </div>
+              </div>
+
+              <div
+                id="progressoMaterias"
+                class="lista-progresso"
+              ></div>
+            </section>
+
+            <!-- Histórico -->
+            <section class="cartao">
+
+              <div class="titulo-cartao">
+
+                <div>
+                  <p class="titulo-pequeno">
+                    HISTÓRICO
+                  </p>
+
+                  <h3>
+                    Sessões recentes
+                  </h3>
+                </div>
+              </div>
+
+              <div
+                id="sessoesRecentes"
+                class="lista-sessoes"
+              ></div>
+            </section>
+          </div>
+        </div>
+      </section>
+
+      <!-- =================================================
+           GERENCIAMENTO
+           ================================================= -->
+
+      <section
+        id="painelGerenciamentoCronograma"
+        class="painel-cronograma"
+        hidden
+      >
+
+        <div class="cabecalho-painel">
+
+          <div>
+            <p class="titulo-pequeno">
+              PLANEJAMENTO
+            </p>
+
+            <h2>
+              Edital verticalizado
+            </h2>
+
+            <p>
+              Crie projetos separados e monte as
+              matérias e os itens de cada edital.
+            </p>
+          </div>
+
+          <button
+            id="botaoNovoProjeto"
+            class="botao-principal"
+            type="button"
+          >
+            ＋ Novo projeto
+          </button>
+        </div>
+
+        <!-- Formulário do projeto -->
+        <section
+          id="formularioProjetoCaixa"
+          class="cartao formulario-projeto"
+          hidden
+        >
+
+          <div class="titulo-cartao">
+
+            <div>
+              <p class="titulo-pequeno">
+                PROJETO
+              </p>
+
+              <h3 id="tituloFormularioProjeto">
+                Novo projeto
+              </h3>
+            </div>
+
+            <button
+              id="botaoFecharFormularioProjeto"
+              class="botao-icone"
+              type="button"
+              aria-label="Fechar"
+            >
+              ×
+            </button>
+          </div>
+
+          <form id="formularioProjeto">
+
+            <input
+              id="idProjetoEdicao"
+              type="hidden"
+            >
+
+            <div class="grade-formulario-projeto">
+
+              <label class="campo-formulario">
+
+                Nome do projeto
+
+                <input
+                  id="campoNomeProjeto"
+                  type="text"
+                  placeholder="Ex.: Polícia Penal de Pernambuco"
+                  required
+                >
+              </label>
+
+              <label class="campo-formulario">
+
+                Órgão
+
+                <input
+                  id="campoOrgaoProjeto"
+                  type="text"
+                  placeholder="Ex.: SEAP-PE"
+                >
+              </label>
+
+              <label class="campo-formulario">
+
+                Cargo
+
+                <input
+                  id="campoCargoProjeto"
+                  type="text"
+                  placeholder="Ex.: Policial Penal"
+                >
+              </label>
+
+              <label class="campo-formulario">
+
+                Data da prova
+
+                <input
+                  id="campoDataProvaProjeto"
+                  type="date"
+                >
+              </label>
+            </div>
+
+            <div class="acoes-formulario">
+
+              <button
+                id="botaoCancelarProjeto"
+                class="botao-secundario"
+                type="button"
+              >
+                Cancelar
+              </button>
+
+              <button
+                id="botaoSalvarProjeto"
+                class="botao-principal"
+                type="submit"
+              >
+                Salvar projeto
+              </button>
+            </div>
+
+            <p
+              id="mensagemProjeto"
+              class="mensagem-formulario"
+              role="status"
+            ></p>
+          </form>
+        </section>
+
+        <!-- Lista dos projetos -->
+        <div
+          id="listaProjetos"
+          class="lista-projetos"
+        ></div>
+
+        <!-- Editor do edital selecionado -->
+        <section
+          id="editorEdital"
+          class="editor-edital"
+          hidden
+        >
+
+          <div class="cabecalho-editor-edital">
+
+            <div>
+              <p class="titulo-pequeno">
+                PROJETO SELECIONADO
+              </p>
+
+              <h2 id="nomeProjetoEditor">
+                Projeto
+              </h2>
+
+              <p id="resumoProjetoEditor"></p>
+            </div>
+
+            <div class="acoes-projeto">
+
+              <button
+                id="botaoEditarProjeto"
+                class="botao-secundario"
+                type="button"
+              >
+                Editar projeto
+              </button>
+
+              <button
+                id="botaoExcluirProjeto"
+                class="botao-perigo-texto"
+                type="button"
+              >
+                Excluir projeto
+              </button>
+            </div>
+          </div>
+
+          <!-- Adicionar matéria -->
+          <section class="cartao adicionar-materia">
+
+            <div>
+              <p class="titulo-pequeno">
+                NOVA MATÉRIA
+              </p>
+
+              <h3>
+                Adicionar ao edital
+              </h3>
+            </div>
+
+            <form id="formularioMateriaCronograma">
+
+              <div class="grade-materia">
+
+                <label class="campo-formulario">
+
+                  Nome da matéria
+
+                  <input
+                    id="campoNomeMateriaCronograma"
+                    type="text"
+                    placeholder="Ex.: Direito Penal"
+                    required
+                  >
+                </label>
+
+                <label class="campo-formulario">
+
+                  Meta diária (minutos)
+
+                  <input
+                    id="campoMetaMateriaCronograma"
+                    type="number"
+                    min="1"
+                    max="1440"
+                    value="60"
+                    required
+                  >
+                </label>
+
+                <label class="campo-formulario campo-cor">
+
+                  Cor
+
+                  <input
+                    id="campoCorMateriaCronograma"
+                    type="color"
+                    value="#ff6b00"
+                  >
+                </label>
+              </div>
+
+              <fieldset class="dias-semana">
+
+                <legend>
+                  Dias de estudo
+                </legend>
+
+                <label>
+                  <input
+                    type="checkbox"
+                    name="diaMateria"
+                    value="1"
+                  >
+                  Seg
+                </label>
+
+                <label>
+                  <input
+                    type="checkbox"
+                    name="diaMateria"
+                    value="2"
+                  >
+                  Ter
+                </label>
+
+                <label>
+                  <input
+                    type="checkbox"
+                    name="diaMateria"
+                    value="3"
+                  >
+                  Qua
+                </label>
+
+                <label>
+                  <input
+                    type="checkbox"
+                    name="diaMateria"
+                    value="4"
+                  >
+                  Qui
+                </label>
+
+                <label>
+                  <input
+                    type="checkbox"
+                    name="diaMateria"
+                    value="5"
+                  >
+                  Sex
+                </label>
+
+                <label>
+                  <input
+                    type="checkbox"
+                    name="diaMateria"
+                    value="6"
+                  >
+                  Sáb
+                </label>
+
+                <label>
+                  <input
+                    type="checkbox"
+                    name="diaMateria"
+                    value="0"
+                  >
+                  Dom
+                </label>
+              </fieldset>
+
+              <div class="acoes-formulario">
+
+                <button
+                  class="botao-principal"
+                  type="submit"
+                >
+                  ＋ Adicionar matéria
+                </button>
+              </div>
+
+              <p
+                id="mensagemMateriaCronograma"
+                class="mensagem-formulario"
+                role="status"
+              ></p>
+            </form>
+          </section>
+
+          <!-- Matérias e itens do edital -->
+          <div
+            id="listaMateriasEdital"
+            class="lista-materias-edital"
+          ></div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <div
+    id="avisoCronograma"
+    class="aviso"
+    role="status"
+  ></div>
+</body>
+</html>
